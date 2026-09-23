@@ -20,3 +20,14 @@ marca/pdf/
 .env*.local
 *.tsbuildinfo
 next-env.d.ts
+
+# Vídeos y frames del hero (viven en Vercel Blob, no en Git)
+*.mp4
+design/check-*.png
+descartes/
+
+# Frames del vídeo del hero (provisionales, en local)
+public/hero-frames/
+
+# Caché de Python (linter de slopmonster)
+__pycache__/

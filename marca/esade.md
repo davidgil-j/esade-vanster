@@ -1,8 +1,8 @@
 # La marca de Esade
 
 Actualizado: 2026-09-23 · **Qué es:** la ficha de marca de Esade para la landing de Vänster
-(agendas y calendarios de regalo para los trabajadores). **Esta es la marca que manda**; Vänster
-solo firma (footer y contacto).
+(agendas y calendarios de regalo para los trabajadores). **Es la marca de los productos** (la agenda
+y el calendario). La página la habla Vänster; ver `PLAN.md`.
 
 **Fuente única:** `marca/pdf/2. Actualización Manual de Marca Esade (2026).pdf` (51 páginas),
 leído entero. Cada dato lleva su página: `(p. N)`.

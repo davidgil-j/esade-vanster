@@ -17,6 +17,14 @@ negocio vive en [[../perfil]]; la marca de Reportia, en [[../../reportia/marca/L
 `(?)` **No hay versión vectorial.** Los dos son PNG bajados de su propia web. Para un titular
 grande se quedarán cortos: si hace falta, se le pide el `.ai` o el `.svg` a Jasmina.
 
+## ⭐ El fucsia oficial: `#C40452`
+
+Es el que pintan los bloques sólidos del PDF de aplicaciones de Vänster
+(`marca/pdf/VÄNSTER_aplicacions.pdf`): el avatar de LinkedIn, el mosaico y el dorso de las
+tarjetas. **Confirmado por David el 2026-09-23.** Es también el que usó la landing de L'Occitane.
+El `#EE3364` de la tabla de abajo es lo que se ve en su web, pintado al 90 %. No es el valor de
+marca: no se usa.
+
 ## La identidad, medida por superficie
 
 De **medir `vanster.design/es/`** el 2026-09-20, recorriendo la página entera y muestreando
@@ -25,10 +33,10 @@ De **medir `vanster.design/es/`** el 2026-09-20, recorriendo la página entera y
 | | Valor | Cuánta pantalla ocupa |
 |---|---|---|
 | **Fondo** | `#FFFFFF` | **64 %.** El blanco es el suelo |
-| **⭐ El color de marca** | `#EE3364` a 90 % | **18 %.** Un **fucsia** intenso, tirando a frambuesa. Es lo que baña la portada entera |
+| **El color de marca, tal como sale en la web** | `#EE3364` a 90 % | **18 %.** Un **fucsia** intenso, tirando a frambuesa. Es lo que baña la portada entera. El oficial es `#C40452` (arriba) |
 | **Imágenes** | — | 6 % |
 | **Negro** | `#000000` | 1,5 %. Texto y un panel del portfolio |
-| **Fucsia oscuro** | `#C30450` | 0,2 %. Una variante puntual del anterior |
+| **Fucsia oscuro** | `#C30450` | 0,2 %. Prácticamente el oficial `#C40452` |
 | **Amarillo** | `#FDBA12` | **Ni aparece en superficie.** Solo el icono del menú y una línea de texto |
 
 | | |
@@ -62,8 +70,6 @@ landing nueva tiene que estar por encima de su propia web, no imitarla.
 
 ## Qué falta `(?)`
 
-- **El valor oficial del fucsia.** El medido es `#EE3364` pintado al 90 %, así que el valor puro
-  de la marca puede ser otro. Lo sabe Jasmina.
 - **El vectorial del logotipo**, y si existe versión sin el claim.
 - **Qué papel tiene el amarillo de verdad:** si es un segundo color de la identidad o solo un
   detalle de esta web.

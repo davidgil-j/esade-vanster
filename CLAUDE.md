@@ -8,7 +8,7 @@ Propuesta de Vänster (estudio de diseño de Barcelona) a Esade: agendas y calen
 - Ante cualquier duda, pregúntame antes de hacer nada.
 
 ## Reglas fijas
-- Stack (fase 4): Next.js (última estable) App Router + JavaScript + Tailwind 3 + Framer Motion. NO TypeScript. Nada de shadcn.
+- Stack (fase 4): Next.js (última estable) App Router + JavaScript + Tailwind 3 + Framer Motion + GSAP (ScrollTrigger, SplitText) + Lenis + three.js con React Three Fiber y drei, todo instalado con npm. NO TypeScript. Nada de shadcn. Un solo reloj: Lenis dentro de `gsap.ticker`; GSAP/three y Motion no se mezclan en el mismo componente.
 - Servidor local: `next dev -p 3002` (el 3001 es L'Occitane).
 - Idioma de la web: castellano. "esade" en minúsculas cuando actúa como elemento gráfico; "Esade" dentro de un texto.
 - NUNCA hagas commit ni push: lo hago yo con GitHub Desktop.
@@ -18,8 +18,21 @@ Propuesta de Vänster (estudio de diseño de Barcelona) a Esade: agendas y calen
 - Los PDFs de marca viven en marca/pdf/ y no se suben a GitHub.
 - Un solo archivo de decisiones de diseño: PLAN.md. No crear otros archivos de decisiones.
 
+## Uso de skills (todas las fases, todas las sesiones)
+- Cada respuesta empieza con dos líneas: "Fase: X" y "Skills usadas en esta respuesta: ...".
+- En cada fase se invocan EXPLÍCITAMENTE todas las skills que .claude/skills/diseno/piezas.md asigna a esa fase. Si en una fase no se usa alguna de las asignadas, se dice cuál y por qué.
+  - Fase 0: impeccable shape.
+  - Fase 1: slopmonster.
+  - Fase 2: prototype y los estilos cerrados (high-end-visual-design, minimalist-ui, industrial-brutalist-ui).
+  - Fase 3: impeccable typeset y colorize, apple-design.
+  - Fase 4: design-taste-frontend, impeccable layout y adapt, mobile-native, el estilo cerrado elegido.
+  - Fase 5: emil-design-eng, animate, review-animations, apple-design.
+  - Fase 6: impeccable audit, critique y polish, review-animations, mobile-native, slopmonster.
+- **prototype y review-animations solo las puede lanzar David** (llevan `disable-model-invocation`). No se tocan sus SKILL.md. Al llegar a su fase, le doy la orden exacta que tiene que escribir.
+- **slopmonster en castellano:** su nota es de inglés. En las fases 1 y 6 paso yo el linter (`deslop.py`) y reviso a mano contra la lista de morralla de `.claude/skills/diseno/criterio.md` (ley 1). No hay anexo de castellano. La limpieza con otro modelo (`cleanse.sh`) no se ejecuta aquí: preparo el texto y David lo pega en ChatGPT, una sola vez y con el texto final.
+
 ## Marca
-Fichas en marca/. Manda la de Esade; Vänster firma (footer y contacto).
+Fichas en marca/. Es una landing DE VÄNSTER para Esade: Vänster es quien habla (marco, voz, lockup «esade × Vänster», botones, CTA, progreso, «Quiénes somos» y cierre, con su fucsia, Montserrat y Mulish); Esade es lo que se enseña (la agenda y el calendario llevan sus azules, sus diagonales y su logo según su manual). La regla de máximo 3 colores es para las piezas de Esade, no para la página.
 Contacto de Vänster: info@vanster.design
 
 <!-- BEGIN:nextjs-agent-rules -->
