@@ -8,3 +8,15 @@ node_modules/
 .claude/settings.local.json
 .impeccable/
 marca/pdf/
+
+# Next.js (fusionado de create-next-app)
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+/coverage
+/out/
+/build
+*.pem
+.env*.local
+*.tsbuildinfo
+next-env.d.ts
