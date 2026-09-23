@@ -8,7 +8,7 @@ Propuesta de Vänster (estudio de diseño de Barcelona) a Esade: agendas y calen
 - Ante cualquier duda, pregúntame antes de hacer nada.
 
 ## Reglas fijas
-- Stack (fase 4): Next.js App Router + JavaScript (NO TypeScript) + Tailwind + Framer Motion. Nada de shadcn.
+- Stack (fase 4): Next.js (última estable) App Router + JavaScript + Tailwind 3 + Framer Motion. NO TypeScript. Nada de shadcn.
 - Servidor local: `next dev -p 3002` (el 3001 es L'Occitane).
 - Idioma de la web: castellano. "esade" en minúsculas cuando actúa como elemento gráfico; "Esade" dentro de un texto.
 - NUNCA hagas commit ni push: lo hago yo con GitHub Desktop.
@@ -21,3 +21,13 @@ Propuesta de Vänster (estudio de diseño de Barcelona) a Esade: agendas y calen
 ## Marca
 Fichas en marca/. Manda la de Esade; Vänster firma (footer y contacto).
 Contacto de Vänster: info@vanster.design
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
