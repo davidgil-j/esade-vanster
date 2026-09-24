@@ -12,13 +12,14 @@ export const ESADE = {
 export const LOGOS = {
   esadeBlue: '/brand/esade-logo.svg',
   esadeWhite: '/brand/esade-logo-blanco.svg',
-  vansterColor: '/brand/vanster-logotipo-color.png',
-  vansterWhite: '/brand/vanster-logotipo-blanco.png',
+  // Vectoriales, sacados tal cual del PDF de aplicaciones de Vänster (marca/vanster/LEEME.md)
+  vansterColor: '/brand/vanster-logotipo-fucsia.svg',
+  vansterWhite: '/brand/vanster-logotipo-blanco.svg',
 };
 
 // Proporciones de los logos (px del archivo original)
 export const ESADE_LOGO_RATIO = 196 / 393;
-export const VANSTER_LOGO_RATIO = 74 / 361;
+export const VANSTER_LOGO_RATIO = 26.68 / 133;
 
 export const tanDeg = (deg) => Math.tan((deg * Math.PI) / 180);
 

@@ -85,6 +85,29 @@ de espiga, ni la misma pantalla de carga.
 **Se copia el nivel, no el aspecto:** si esta landing vuelve a llevar vídeo en letras y raíl
 lateral, será L'Occitane con otro logotipo.
 
+### Criterio del rediseño final: nivel Apple
+
+*Añadido el 2026-09-23 con el prompt «REDISEÑO FINAL». Manda sobre la fase 4.*
+
+- **Fluidez antes que efecto.** Cero pins y cero scroll-jacking: ninguna animación detiene, retrasa
+  ni captura el scroll. Si un efecto no llega al presupuesto, se simplifica hasta que llega.
+- **Presupuestos:**
+  - 60 fps estables (120 donde la pantalla lo permita).
+  - Ninguna tarea de más de 50 ms durante el scroll.
+  - INP < 200 ms, CLS < 0,02.
+  - LCP < 2,0 s en escritorio y < 2,5 s en móvil.
+  - JS inicial < 250 KB comprimido.
+  - Vídeo < 2 MB.
+  - Lighthouse móvil ≥ 90.
+- **L'Occitane es el listón de acabado y de ritmo, no de efectos** (medido en `design/listón.md`).
+  Todas las ideas son propias: hoja 2026 → 2027, lamas de la fachada, mármol vivo, abrir y hojear
+  arrastrando, deslizable de pintura.
+- **«Esade es geometría, Vänster es líquido».** Las secciones de Esade tienen bordes rectos (lamas y
+  diagonales). Las de Vänster son de mármol vivo con bordes ondulados. El lockup es líquido por
+  geometría.
+- **Objetos fotográficos:** las fotos de producto se componen con el diseño real (OpenCV) y los
+  logos oficiales. No se usa 3D.
+
 ### Caja de referencias (David Comellas)
 
 David: *«todo en general. lo que consideres.»* Entran las tres, y yo decido en las fases 2 y 5
@@ -466,6 +489,100 @@ sin JavaScript.*
 - **El vídeo en 4K**, en 16:9 y 9:16.
 - **Subir los frames a Vercel Blob.**
 
+
+## 5 · Rediseño final
+
+*Prompt «REDISEÑO FINAL» (2026-09-23/24), hecho en autonomía. Sustituye a la construcción de la
+fase 4: sin 3D, con objetos fotográficos, mármol vivo y lamas. Verificado en producción.*
+
+**Tokens de movimiento** (`src/app/globals.css` y `src/lib/motion.js`):
+
+| Token | Valor | Uso |
+|---|---|---|
+| Curva única de entrada | `cubic-bezier(0.22, 1, 0.36, 1)` (`--ease`, GSAP `'vanster'`) | Toda entrada y todo cambio de estado |
+| Pulsación | `scale(0.97)` en 100 ms | Botones, píldoras, tiradores, campos |
+| Muelle sin rebote | rigidez 400, amortiguación 40 (crítica) · CSS `--spring` = `linear()` de 450 ms | Al soltar; tapa, hojas y deslizable |
+| Muelle lento | rigidez 170, amortiguación 26 (crítica) | Giros grandes (tapa, hojas) |
+| Duraciones | 100 · 300 · 450 · 700 ms | Pulsar · interfaz · giros · entradas |
+| Enlaces | opacidad 0,7 al pasar, 0,6 al pulsar, 300 ms | Solo con `(hover: hover) and (pointer: fine)` |
+| Radios | 0 · 999 px · 12 px | Piezas de Esade y campos · píldoras y círculos · el panel del selector |
+
+**Excepciones pedidas por David:** las lamas de la portada van con `expo.out` en 1,1 s y un
+escalonado de 35 ms; el tirador lleva la flecha en el amarillo de la veta `#FBA90E`.
+
+**Arquitectura:**
+- Un solo reloj: `gsap.ticker` mueve Lenis (solo rueda y trackpad), ScrollTrigger, los muelles y
+  los cuatro lienzos del mármol.
+- Cero pins. Los apilados son CSS sticky con scrub:
+  - la portada queda debajo de «La idea», escala a 0,94 y se oscurece;
+  - «Con vuestra marca» queda debajo de «Quiénes somos».
+- **Objetos fotográficos** (`scripts/composite.py`, `scripts/render-designs.cjs`):
+  - Tres fotos ampliadas ×2 con Real-ESRGAN.
+  - Esquinas afinadas con gradiente y Huber.
+  - Diseños renderizados desde el SVG oficial, deformados con homografía y multiplicados por el mapa
+    de luz (luminancia / p95).
+  - Las anillas, recortadas en una capa aparte.
+- **Mármol vivo** (`src/lib/marble.js`): WebGL a mano, un quad por lienzo, dos capas de *domain
+  warping*.
+  - Se agita con el scroll (hasta 3×) y el cursor lo remueve.
+  - Bordes líquidos que solo ondulan en la franja que sobresale.
+  - Arranca por proximidad y se pausa fuera de pantalla.
+  - Pasa a imagen fija si no llega a 55 fps.
+- **Vídeo** (`scripts/video.sh`): sin audio, desenfoque σ 5 dentro del archivo, y σ 14 solo en la
+  placa y en el banderín con texto inventado.
+- **Mármol en imagen** (`scripts/marmol.py`): versión para texto con la luminancia comprimida en
+  OKLab; contraste mínimo medido 4,8:1 con texto blanco en el 100 % de los píxeles.
+
+**Verificación (producción, `next build` + `next start`):**
+
+| Medida | Presupuesto | 1440 (rueda) | 390 (táctil) |
+|---|---|---|---|
+| fps en el recorrido completo, normal y a ráfagas | 60 | 59,8 | 59,9 |
+| Tareas largas durante el scroll | 0 > 50 ms | 0 | 0 |
+| LCP (traza real) | < 2,0 / 2,5 s | 124 ms | 60 ms |
+| CLS | < 0,02 | 0,008 | 0,0001 |
+| INP (aprox.) | < 200 ms | 64 ms | 64 ms |
+| Mármol en la GPU (mediana por lienzo) | ≤ 1 ms | 0,62–0,86 ms | 0,07–0,19 ms |
+| JS inicial | < 250 KB | 243 KB gzip · 211 KB brotli | — |
+| Vídeo | < 2 MB | 646 KB mp4 · 388 KB webm | 220 KB · 151 KB |
+| Lighthouse | ≥ 90 en móvil | 98 escritorio | 91–93 (accesibilidad 100) |
+
+- **LCP de Lighthouse en móvil:** su simulación da 3,0–3,5 s. Es su modelo pesimista, que suma la
+  descarga de todo el JS en 4G lento; el LCP real es la hoja de «2026», pintada a los 60–124 ms.
+- **Pruebas de uso** con ratón, dedo y teclado:
+  - el comparador, abrir y cerrar la agenda, y hojear el calendario (arrastrando, con un toque,
+    con las flechas y con los botones);
+  - el selector, que hace pasar las hojas en ráfaga y marca el día;
+  - el deslizable: correo, portapapeles y aviso.
+  - Además, el scroll vertical nunca se bloquea encima de los objetos.
+- **Archivos:** capturas, trazas resumidas, informes de Lighthouse y la comparativa con L'Occitane,
+  en `design/final-check/`.
+
+**Pendiente, fuera de mi alcance:** la tira de trabajos de Vänster para Esade (ver «Decidido sin
+David»). Hacen falta piezas con la identidad actual de Esade.
+
+### Ronda de David (2026-09-24): el relato por delante de los efectos
+
+Crítica completa (impeccable critique, 20/32) a partir de sus notas. Él eligió «fucsia + mármol una
+vez» y «jerarquía solo con composición»; lo de la agenda me lo dejó a mí.
+- **Dos piezas, dos capítulos gemelos:**
+  - Cada pieza lleva título a toda anchura, objeto protagonista (8 columnas, encuadre 1,2:1) y, al
+    lado, texto y campo.
+  - La agenda va sobre blanco y el calendario sobre gris papel, así que el cambio de fondo marca el
+    cambio de pieza.
+  - Ya no hay objeto antes del título.
+- **La agenda, una sola vez:** la vista cenital, cerrada y centrada con el nombre.
+  - Se personaliza desde el campo; si estaba abierta, se cierra al tocarlo.
+  - Se abre arrastrando en el mismo sitio, y el encuadre se desplaza con el giro hasta centrar la
+    doble página.
+  - La foto en tres cuartos queda solo en el comparador de «La idea», que es el argumento.
+- **Fucsia de Vänster:**
+  - El mármol sale una sola vez (la hoja de carga y «La idea»), comprimido hacia el fucsia #C40452.
+  - Quiénes somos va en fucsia plano con el logotipo blanco grande.
+  - El cierre es el anochecer bajo el fucsia en multiplicar, como las tarjetas de Vänster: mármol
+    delante, fucsia detrás.
+- **Lamas solo en la portada:** las de «Con vuestra marca» y el cierre no significaban nada. Fuera.
+
 ## Decidido sin David
 
 *Una línea por decisión, con el porqué. David la revisa al final.*
@@ -540,3 +657,137 @@ sin JavaScript.*
     aparece como render.
 - **Icono del comparador y del selector:** dos flechas y un calendario dibujados como formas
   geométricas simples, sin librería de iconos, porque no estaba autorizada.
+
+### Rediseño final (2026-09-23/24)
+
+- **Skills: hay 13 de las 23 esperadas.** Faltan improve-animations, find-animation-opportunities,
+  animation-vocabulary, pick-ui-library, redesign-existing-projects, image-to-code,
+  imagegen-frontend-web, brandkit, full-output-enforcement y youtube. No las instalo: no estaban
+  autorizadas.
+- **21st.dev:** sin su MCP en esta sesión. Los componentes (revelado, magnético, arrastre con
+  inercia) salen de GSAP (SplitText, Draggable, InertiaPlugin) y de código propio. Nada de shadcn.
+- **Fotos de GPT** renombradas: agenda-cerrada (tres cuartos), agenda-abierta (cenital) y
+  calendario (caballete). Se amplían con Real-ESRGAN x4 y se reducen a ×2 con Lanczos, porque la
+  opción -s 2 del modelo x4plus rompía los mosaicos. Las ampliaciones quedan fuera de Git.
+- **Proporción real medida:** la tapa y las páginas son de 0,77, no el A5 0,705, y la hoja del
+  calendario de 1,45. Los diseños se recomponen para esas proporciones; nunca se estiran.
+- **Color medido tras el mapa de luz:** ΔE2000 ≤ 0,2 en la zona mejor iluminada, para #000B3D y
+  #224BA0 en las tapas, la guarda y las 12 hojas. El límite era 3.
+- **Vista cenital de la agenda:** la página izquierda se quita del todo en vez de esconderla con
+  clip-path.
+  - El hueco se rellena con lino en la foto original (luz interpolada y trama cosida con corte de
+    error mínimo), y se amplía con Real-ESRGAN para que la trama nueva y la vieja se inventen igual.
+  - Así, cerrada, la agenda es solo la tapa sobre la mesa.
+- **Tapa de catálogo:** logo blanco oficial pequeño abajo a la derecha, antes de la goma.
+  - En el comparador, la diseñada va a la izquierda y la de catálogo a la derecha, con la costura en
+    reposo al 56 %.
+  - Así ningún logo queda cortado: el de Esade acaba en el 44 % y el de catálogo empieza en el 65 %.
+- **Nombre en la tapa:** su línea base pasa del 66 % al 60 % del alto, para que en tapas de 0,77 no
+  roce la diagonal.
+- **Vídeo:** el desenfoque general (σ 5) aún dejaba adivinar «UNIVERSITY» y «Do Good Do Better».
+  Solo esas dos zonas llevan σ 14, con un borde suave; el vinilo del cristal y «esade.edu» ya no se
+  leían.
+- **Mármol:**
+  - El amarillo de la veta, muestreado, es #FBA90E.
+  - La versión «marmol-texto» se oscurece en OKLab, devolviendo croma a las vetas claras y girando
+    un poco el amarillo hacia el naranja para que no se vuelva oliva.
+  - Contraste mínimo medido: 4,8:1.
+  - El móvil usa la textura a la mitad y el botón una de 560 px.
+- **Tira de trabajos de Quiénes somos: fuera.** Descargué las 7 imágenes de la ficha de Esade en
+  vanster.design:
+  - Seis llevan la identidad anterior: el logotipo «ESADE» en mayúsculas o con la «E» en bloque,
+    que el manual actual prohíbe como elemento gráfico.
+  - E3b lleva además logos de otras organizaciones (Fundación abertis, EY, PwC).
+  - Solo E1 («Resumen ejecutivo») pasa, y una pieza sola no hace la tira de 3 a 5 que se pedía.
+  - Si Vänster tiene piezas con la identidad nueva, entran sin tocar el código.
+- **CTA magnético:** el imán (8 px como máximo, solo con ratón) va en la píldora de la cabecera. El
+  «Quiero hablarlo» del cierre es el deslizable de pintura del punto 10C, que es posterior y más
+  concreto.
+- **El amarillo de la veta** está en el «×», en el anillo de foco y en la flecha del tirador (10B).
+  El fucsia plano #C40452 queda en la selección de texto, la barra de scroll, el raíl sobre claro y
+  el primer color de la hoja de carga. Las anillas no llevan mármol (punto F).
+- **Anillo de foco:** amarillo de la veta con un filete de tinta pegado al control, para que se vea
+  sobre cualquier fondo. Sobre el vídeo es blanco (12.C). Sigue el radio del control.
+- **El tirador:**
+  - círculo de 44 px en tinta con filete blanco de 1 px y flecha amarilla, con contraste de 8,9:1
+    entre flecha y fondo;
+  - es el mismo en el comparador (flecha doble), el borde de la tapa, los meses del calendario y el
+    deslizable;
+  - la flecha se desplaza 0,75 px hacia la punta (centro óptico).
+- **Muelle «sin rebote»:** con rigidez 400 y amortiguación 30 rebota un 3 %. Uso la amortiguación
+  crítica (40).
+- **Lamas en scaleX por franja,** no con clip-path: el efecto es el mismo y el transform no repinta.
+  - La franja arranca 20vh por encima de la frontera.
+  - Se cierran despacio y se abren deprisa, para no tapar el texto ni el final de la página.
+  - El cierre mide al menos 115svh.
+- **Bordes líquidos:** la onda solo vive en los 40 px que sobresalen de la sección (20 en móvil).
+  Metida dentro de la sección dejaba ver lo que había debajo.
+- **Hoja de carga:**
+  - El 6 → 7 dura 450 ms en dos mitades de 225 ms. Como no hay tablillas opacas, cada mitad aparece
+    solo cuando le toca.
+  - «2026» se lee al menos 0,5 s.
+  - La hoja se levanta con rotateX 92° en 700 ms.
+  - Si el JS llega después de 1,9 s, se retira con un fundido.
+  - Red de seguridad en CSS a los 3,2 s.
+- **Titular de la portada:** se pinta desde el primer fotograma bajo la hoja y las lamas (LCP
+  temprano), se parte en líneas tapado y no se recompone al acabar. Recomponerlo contaba como
+  desplazamiento (CLS); solo se recompone si cambia el ancho de la ventana.
+- **Lockup volante:** su punto de partida va en transform, no en left/top (que contaban como CLS).
+- **Draggable e InertiaPlugin** se cargan aparte, después de hidratar: el JS inicial baja de 257 a
+  243 KB con gzip.
+  - Con allowNativeTouchScrolling, Draggable ponía `touch-action: manipulation` y el navegador
+    cortaba el arrastre horizontal.
+  - Lo fuerzo a `pan-y`: el vertical es del scroll y el horizontal, del dedo.
+- **Rendimiento del mármol:**
+  - Nunca más píxeles de los que da la textura en ese encuadre.
+  - El ruido se calcula una vez (128 × 128) para todos los lienzos; antes costaba cientos de ms con
+    la CPU lenta.
+  - Cada lienzo arranca cuando su sección está a pantalla y media.
+  - Resultado: Lighthouse móvil pasa de 65 a 91–93.
+- **Fotos de escena en 800, 1200 y 2400 px**, porque Lighthouse pedía 162 KB menos en móvil.
+- **Líneas de escritura de la semana:** azul claro sólido y fino, no al 35 %. Es la ronda de Laura:
+  una tinta más clara contaba como un color más.
+- **`.gitignore`:** `public/video/*.mp4` sí se sube (lo exige 12 · verificación); quedan fuera los
+  vídeos de origen, `design/portfolio/`, las ampliaciones ×2 y las trazas crudas de Chrome.
+- **Ronda de las cinco personas sobre la versión nueva:**
+  - **Montse (iPhone):** todo lo táctil mide 44 px o más, los campos 18 px (sin zoom), sin desborde
+    y el scroll libre sobre los objetos. El deslizable no respondía al dedo (lo del touch-action):
+    corregido.
+  - **Laura (marca), con las reglas previas de David:** logos oficiales sin cajas ni opacidad; tapas
+    y hojas en tres colores y diagonales de 5, 10 y 15°. Corregida la tinta de la semana.
+    - Propone quitar «ESADE» en mayúsculas de la demostración. No lo aplico: es la pieza que pidió
+      David (se funde en el logo).
+    - Señala que el manual no da tamaño mínimo del logo y que en la cabecera móvil la cinta se lee
+      pequeña. Lo apunto para Esade.
+  - **Jordi (accesibilidad):** Lighthouse 100; orden de tabulación lógico; foco visible en todo;
+    un h1 y seis h2.
+    - El botón de la tapa pasa a «Abrir la agenda de Marta Puig» (etiqueta y nombre visible).
+    - Fuera el aria-label que SplitText ponía en un párrafo.
+  - **Pau (rendimiento):** todo en presupuesto salvo el LCP simulado de Lighthouse en móvil
+    (explicado arriba).
+  - **Yasmina (contra L'Occitane):**
+    - Las lamas del cierre tapaban el final de la página: corregido.
+    - Los mármoles no se confunden: el suyo es rosa, de piedra, quieto y de fondo; el nuestro es
+      pintura roja y naranja que fluye y hace de firma.
+    - Quiénes somos queda más sobrio que el suyo por la falta de la tira de trabajos.
+
+### Ronda de David (2026-09-24)
+
+- **Agenda (me lo dejó a mí): solo la vista cenital.**
+  - Con la foto en tres cuartos y la cenital en la misma sección parecían dos agendas.
+  - El encuadre (80 % del ancho de la foto; 76 % en móvil) se desplaza con el giro de la tapa.
+    Cerrada, la agenda queda casi centrada; abierta, la doble página se centra en el lomo.
+- **Logotipo vectorial de Vänster:** los trazos salen del PDF de aplicaciones (página del
+  mosaico), sin redibujar, y coinciden con el PNG de su web. Los PNG no aguantaban el tamaño de
+  Quiénes somos. Ahora el lockup también usa el SVG.
+- **Mármol comprimido hacia el fucsia (k = 0,35 en OKLCh):**
+  - Se lee fucsia y conserva un hilo del naranja y el amarillo de sus tarjetas.
+  - La versión para texto sigue a 4,8:1 o más en el 100 % de los píxeles.
+  - El mármol original y la versión naranja siguen en `public/marmol/`, pero la web ya no los
+    carga.
+- **Quiénes somos sube sobre «Con vuestra marca»** con la onda de Vänster en fucsia plano
+  (máscara CSS, sin WebGL). «Con vuestra marca» pasa a blanco con un filete, porque el gris es
+  ahora del calendario.
+- **Cierre en fucsia en multiplicar sobre el anochecer:** el texto blanco nunca baja de 6:1,
+  porque el multiplicar solo oscurece el fucsia.
+

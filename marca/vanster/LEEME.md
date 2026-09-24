@@ -11,11 +11,14 @@ negocio vive en [[../perfil]]; la marca de Reportia, en [[../../reportia/marca/L
 
 | Archivo | Qué es |
 |---|---|
-| `vanster-logotipo-color.png` | ⭐ El logotipo en color, sobre fondo claro |
-| `vanster-logotipo-blanco.png` | El mismo en blanco, para fondos oscuros |
+| `vanster-logotipo-blanco.svg` | ⭐ El logotipo vectorial en blanco, para fondos oscuros o de color |
+| `vanster-logotipo-fucsia.svg` | ⭐ El mismo en fucsia `#C40452`, sobre fondo claro |
+| `vanster-logotipo-color.png` | El logotipo en color (PNG de su web, 362 px de ancho) |
+| `vanster-logotipo-blanco.png` | El mismo en blanco (PNG) |
 
-`(?)` **No hay versión vectorial.** Los dos son PNG bajados de su propia web. Para un titular
-grande se quedarán cortos: si hace falta, se le pide el `.ai` o el `.svg` a Jasmina.
+`[HECHO]` **Versión vectorial:** los trazos del logotipo salen tal cual del mosaico de
+`marca/pdf/VÄNSTER_aplicacions.pdf` (página 2). Se extrajeron el 2026-09-24 sin redibujar nada y
+coinciden trazo a trazo con el PNG de la web. Los PNG solo sirven hasta unos 60 px de alto.
 
 ## ⭐ El fucsia oficial: `#C40452`
 

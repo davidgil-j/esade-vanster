@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { gsap, ScrollTrigger, SplitText, EASE_OUT, prefersReducedMotion } from '@/lib/motion';
+import { gsap, ScrollTrigger, SplitText, EASE, D, prefersReducedMotion } from '@/lib/motion';
 
-// Titular que entra por líneas con máscara (coro 6). Ley 2: el titular está visible
-// por defecto y solo se esconde en el instante en que empieza su animación.
+// Titular que entra por líneas con máscara. Visible por defecto: solo se esconde en el instante
+// en que empieza su animación (700 ms como mucho, una sola curva).
 export default function SplitHeading({ as: Tag = 'h2', className = '', children, delay = 0, start = 'top 85%', ...rest }) {
   const ref = useRef(null);
 
@@ -21,9 +21,9 @@ export default function SplitHeading({ as: Tag = 'h2', className = '', children,
         split = SplitText.create(el, { type: 'lines', mask: 'lines', linesClass: 'split-line' });
         tween = gsap.from(split.lines, {
           yPercent: 110,
-          duration: 0.9,
-          ease: EASE_OUT,
-          stagger: 0.07,
+          duration: D.enter,
+          ease: EASE,
+          stagger: 0.08,
           delay,
           onComplete: () => split?.revert(),
         });

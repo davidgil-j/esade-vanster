@@ -1,45 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Lockup from './Lockup';
-import CtaMail from './CtaMail';
+import CtaPill from './CtaPill';
+import { useToneAt } from '@/lib/useTone';
 
-// Cabecera fija (coro 11): el lockup cambia de archivo según el fondo que tiene debajo.
-// Cada sección declara su fondo con data-tone="light | dark | vanster".
+// Cabecera fija: el lockup cambia de archivo según el fondo que tiene debajo (sin recolorear).
+// Mientras el lockup grande de la portada viaja hacia aquí, el de la cabecera espera escondido.
 export default function Header() {
-  const [tone, setTone] = useState('dark');
-
-  useEffect(() => {
-    const sections = Array.from(document.querySelectorAll('[data-tone]'));
-    if (!sections.length) return undefined;
-    let io;
-    const build = () => {
-      io?.disconnect();
-      const line = 36; // mitad de la cabecera
-      io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((e) => {
-            if (e.isIntersecting) setTone(e.target.getAttribute('data-tone'));
-          });
-        },
-        { rootMargin: `-${line}px 0px -${Math.max(0, window.innerHeight - line - 1)}px 0px` }
-      );
-      sections.forEach((s) => io.observe(s));
-    };
-    build();
-    window.addEventListener('resize', build);
-    return () => {
-      io?.disconnect();
-      window.removeEventListener('resize', build);
-    };
-  }, []);
-
+  const tone = useToneAt(() => 36, 'video');
   return (
     <header className={`site-header tone-${tone}`}>
-      <a className="site-header__brand" href="#top" aria-label="vänster × esade, inicio">
-        <Lockup tone={tone} />
+      <a className="site-header__brand link" href="#top" aria-label="vänster × esade, inicio">
+        <Lockup tone={tone === 'light' ? 'light' : 'dark'} />
       </a>
-      <CtaMail variant={tone === 'vanster' ? 'inverse' : tone === 'dark' ? 'ghost' : 'solid'} size="sm" className="site-header__cta" />
+      <CtaPill className="site-header__cta" />
     </header>
   );
 }

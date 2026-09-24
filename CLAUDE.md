@@ -8,7 +8,7 @@ Propuesta de Vänster (estudio de diseño de Barcelona) a Esade: agendas y calen
 - Ante cualquier duda, pregúntame antes de hacer nada.
 
 ## Reglas fijas
-- Stack (fase 4): Next.js (última estable) App Router + JavaScript + Tailwind 3 + Framer Motion + GSAP (ScrollTrigger, SplitText) + Lenis + three.js con React Three Fiber y drei, todo instalado con npm. NO TypeScript. Nada de shadcn. Un solo reloj: Lenis dentro de `gsap.ticker`; GSAP/three y Motion no se mezclan en el mismo componente.
+- Stack (rediseño final): Next.js (última estable) App Router + JavaScript + Tailwind 3 + GSAP (ScrollTrigger, SplitText, Draggable, InertiaPlugin) + Lenis + WebGL a mano para el mármol (un canvas y un quad por sección, sin three), todo instalado con npm. Framer Motion sigue instalado pero no se usa. Sin three.js, React Three Fiber ni drei. NO TypeScript. Nada de shadcn. Un solo reloj: Lenis, ScrollTrigger y el shader dentro de `gsap.ticker`; GSAP y Motion no se mezclan en el mismo componente.
 - Servidor local: `next dev -p 3002` (el 3001 es L'Occitane).
 - Idioma de la web: castellano. "esade" en minúsculas cuando actúa como elemento gráfico; "Esade" dentro de un texto.
 - NUNCA hagas commit ni push: lo hago yo con GitHub Desktop.

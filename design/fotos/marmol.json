@@ -1,0 +1,108 @@
+{
+ "marmol-16x9": {
+  "w": 1672,
+  "h": 941,
+  "webp": 182144,
+  "avif": 131818
+ },
+ "marmol-texto-16x9": {
+  "w": 1672,
+  "h": 941,
+  "webp": 128070,
+  "avif": 110846,
+  "contraste_min": 4.8,
+  "pixeles_ok": 1.0
+ },
+ "marmol-lq-16x9": {
+  "w": 64,
+  "h": 36,
+  "webp": 492,
+  "avif": 549
+ },
+ "marmol-9x16": {
+  "w": 941,
+  "h": 1672,
+  "webp": 179800,
+  "avif": 133233
+ },
+ "marmol-texto-9x16": {
+  "w": 941,
+  "h": 1672,
+  "webp": 128900,
+  "avif": 110879,
+  "contraste_min": 4.84,
+  "pixeles_ok": 1.0
+ },
+ "marmol-lq-9x16": {
+  "w": 64,
+  "h": 114,
+  "webp": 1056,
+  "avif": 864
+ },
+ "marmol-texto-16x9-movil": {
+  "w": 836,
+  "h": 470,
+  "webp": 42690,
+  "avif": 37776
+ },
+ "marmol-texto-9x16-movil": {
+  "w": 470,
+  "h": 836,
+  "webp": 41620,
+  "avif": 37296
+ },
+ "marmol-boton": {
+  "w": 560,
+  "h": 280,
+  "webp": 25246,
+  "avif": 16339
+ },
+ "marmol-fucsia-texto-16x9": {
+  "w": 1672,
+  "h": 941,
+  "webp": 101194,
+  "avif": 82618,
+  "contraste_min": 4.8,
+  "pixeles_ok": 1.0
+ },
+ "marmol-fucsia-texto-16x9-movil": {
+  "w": 836,
+  "h": 470,
+  "webp": 33988,
+  "avif": 27055
+ },
+ "marmol-fucsia-lq-16x9": {
+  "w": 64,
+  "h": 36,
+  "webp": 412,
+  "avif": 492
+ },
+ "marmol-fucsia-texto-9x16": {
+  "w": 941,
+  "h": 1672,
+  "webp": 106156,
+  "avif": 87515,
+  "contraste_min": 4.87,
+  "pixeles_ok": 1.0
+ },
+ "marmol-fucsia-texto-9x16-movil": {
+  "w": 470,
+  "h": 836,
+  "webp": 34688,
+  "avif": 28349
+ },
+ "marmol-fucsia-lq-9x16": {
+  "w": 64,
+  "h": 114,
+  "webp": 824,
+  "avif": 717
+ },
+ "marmol-fucsia-boton": {
+  "w": 560,
+  "h": 280,
+  "webp": 22464,
+  "avif": 13920
+ },
+ "amarillo_veta": "#FBA90E",
+ "amarillo_pixeles": 16176
+}

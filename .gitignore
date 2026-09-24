@@ -21,13 +21,22 @@ marca/pdf/
 *.tsbuildinfo
 next-env.d.ts
 
-# Vídeos y frames del hero (viven en Vercel Blob, no en Git)
+# Vídeos de origen (en local). Los de la web (public/video/) SÍ se suben: los necesita Vercel.
 *.mp4
+!public/video/*.mp4
 design/check-*.png
 descartes/
 
-# Frames del vídeo del hero (provisionales, en local)
-public/hero-frames/
+# Trabajos de Vänster para Esade descargados de vanster.design (solo para revisar la identidad)
+design/portfolio/
 
 # Caché de Python (linter de slopmonster)
 __pycache__/
+
+# Fotos ampliadas (se regeneran con Real-ESRGAN; pesan ~10 MB cada una)
+design/fotos/x2/
+design/fotos/debug/
+
+# Trazas crudas de Chrome (pesan decenas de MB; se regeneran; se suben los resúmenes)
+design/final-check/traza-1440.json
+design/final-check/traza-390.json
