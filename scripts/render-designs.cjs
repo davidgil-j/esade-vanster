@@ -9,7 +9,12 @@ const fs = require('fs');
 const { chromium } = require(process.env.PW || '/Users/davidgiljaques/Documents/GitHub/L-OCCITANE/node_modules/playwright');
 
 const ROOT = path.resolve(__dirname, '..');
-const OUT = path.join(ROOT, 'design/fotos/disenos');
+const OUT = process.env.OUT_DIR || path.join(ROOT, 'design/fotos/disenos');
+// Serif de los objetos de Esade mientras no llegue Esade Type: Newsreader (Google Fonts, libre), la
+// más parecida en contraste y proporción, con cifras alineadas. El manual da Georgia como
+// equivalente de sistema, pero no es libre y sus cifras bailan en la rejilla del calendario.
+const SERIF = process.env.SERIF || 'Newsreader';
+const NUM = 'style="font-variant-numeric: lining-nums tabular-nums"'; // Georgia no tiene cifras alineadas; Newsreader sí
 fs.mkdirSync(OUT, { recursive: true });
 // El logo oficial va incrustado (data URI) para que la página en blanco de Playwright lo cargue.
 const dataUri = (f) => 'data:image/svg+xml;base64,' + fs.readFileSync(path.join(ROOT, f)).toString('base64');
@@ -20,7 +25,7 @@ const C = { dark: '#000B3D', light: '#224BA0', white: '#FFFFFF' };
 const tan = (d) => Math.tan((d * Math.PI) / 180);
 const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 const WEEK = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-const FONTS = '<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Mulish:wght@400;600;700&display=swap" rel="stylesheet">';
+const FONTS = '<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&display=block" rel="stylesheet">';
 
 const corners = JSON.parse(fs.readFileSync(path.join(ROOT, 'design/fotos/esquinas.json'), 'utf8'));
 const PAGE_RATIO = corners['agenda-abierta'].quads.derecha.ratio_wh; // ≈ 0,77 (la tapa es de la misma agenda)
@@ -37,24 +42,30 @@ function coverEsade(W) {
     <rect width="${W}" height="${H}" fill="${C.dark}"/>
     <polygon points="0,${y0} ${W},${y1} ${W},${H} 0,${H}" fill="${C.light}"/>
     <image href="${LOGO_W}" x="${W * 0.12}" y="${H * 0.09}" width="${lw}" height="${lw * LOGO_RATIO}"/>
-    <text x="${W * 0.88}" y="${H * 0.94}" text-anchor="end" fill="${C.white}" font-family="Montserrat" font-weight="700" font-size="${W * 0.062}">2027</text>
+    <text x="${W * 0.88}" y="${H * 0.94}" text-anchor="end" fill="${C.white}" font-family="${SERIF}" font-weight="700" font-size="${W * 0.064}" ${NUM}>2027</text>
   </svg>`,
     // zona del nombre (fracciones de la tapa): línea base y tamaño relativos al ancho
     name: { x: 0.12, baseline: 0.6, size: 0.072, maxW: 0.72 },
   };
 }
 
-// ── Tapa de catálogo: polipiel negra, goma y el logo oficial blanco pequeño en una esquina ──
+// ── Tapa de catálogo: polipiel negra, goma y un logo genérico neutro («LOGO») impreso pequeño en una
+// tinta, abajo a la derecha, antes de la goma. No lleva el logo de Esade: es una agenda de catálogo
+// cualquiera. En el comparador, la costura en reposo no corta ni este logo ni el de la tapa diseñada ──
 function coverCatalogo(W) {
   const H = Math.round(W / PAGE_RATIO);
   const lw = W * 0.2;
+  const INK = '#BFC0C5'; // una sola tinta, gris plata, como un marcaje de catálogo
   return {
     W, H, svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
     <defs><pattern id="g" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#2A292E"/><circle cx="2" cy="2" r="0.9" fill="#323137"/></pattern></defs>
     <rect width="${W}" height="${H}" fill="url(#g)"/>
     <rect x="${W * 0.86}" y="0" width="${W * 0.045}" height="${H}" fill="#1B1A1E"/>
     <rect x="${W * 0.86}" y="0" width="${W * 0.006}" height="${H}" fill="#3A3940"/>
-    <image href="${LOGO_W}" x="${W * 0.62}" y="${H * 0.86}" width="${lw}" height="${lw * LOGO_RATIO}"/>
+    <g fill="${INK}" transform="translate(${W * 0.62} ${H * 0.885})">
+      <circle cx="${lw * 0.09}" cy="${-lw * 0.075}" r="${lw * 0.09}"/>
+      <text x="${lw * 0.24}" y="0" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="${lw * 0.2}" letter-spacing="${lw * 0.012}">LOGO</text>
+    </g>
   </svg>`,
   };
 }
@@ -75,15 +86,15 @@ function week(W) {
   let rows = '';
   days.forEach(([n, name], i) => {
     const y = top + rowH * i;
-    rows += `<text x="${m}" y="${y + rowH * 0.42}" fill="${C.dark}" font-family="Montserrat" font-weight="700" font-size="${W * 0.06}">${n}</text>
-      <text x="${m + W * 0.11}" y="${y + rowH * 0.42}" fill="${C.dark}" font-family="Mulish" font-weight="600" font-size="${W * 0.03}">${name}</text>
+    rows += `<text x="${m}" y="${y + rowH * 0.42}" fill="${C.dark}" font-family="${SERIF}" font-weight="700" font-size="${W * 0.064}" ${NUM}>${n}</text>
+      <text x="${m + W * 0.11}" y="${y + rowH * 0.42}" fill="${C.dark}" font-family="${SERIF}" font-weight="400" font-size="${W * 0.034}">${name}</text>
       <line x1="${m}" y1="${y + rowH * 0.72}" x2="${W - m}" y2="${y + rowH * 0.72}" stroke="${C.light}" stroke-width="${W * 0.0011}"/>
       <line x1="${m}" y1="${y + rowH * 0.98}" x2="${W - m}" y2="${y + rowH * 0.98}" stroke="${C.light}" stroke-width="${W * 0.0011}"/>`;
   });
   return {
     W, H, svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
     <rect width="${W}" height="${H}" fill="${C.white}"/>
-    <text x="${m}" y="${H * 0.065}" fill="${C.light}" font-family="Montserrat" font-weight="700" font-size="${W * 0.032}">enero 2027</text>
+    <text x="${m}" y="${H * 0.065}" fill="${C.light}" font-family="${SERIF}" font-weight="700" font-size="${W * 0.036}" ${NUM}>enero 2027</text>
     ${rows}
   </svg>`,
   };
@@ -150,14 +161,14 @@ function sheet(month, W) {
   const rowH = (H - RING) * 0.12;
   const cells = monthCells(month);
   const meta = [];
-  let grid = WEEK.map((w, i) => `<text x="${mx + colW * (i + 0.5)}" y="${gridTop}" text-anchor="middle" fill="${C.light}" font-family="Mulish" font-weight="700" font-size="${W * 0.016}">${w}</text>`).join('');
+  let grid = WEEK.map((w, i) => `<text x="${mx + colW * (i + 0.5)}" y="${gridTop}" text-anchor="middle" fill="${C.light}" font-family="${SERIF}" font-weight="700" font-size="${W * 0.018}">${w}</text>`).join('');
   cells.forEach((day, i) => {
     if (!day) return;
     const col = i % 7;
     const row = Math.floor(i / 7);
     const cx = mx + colW * (col + 0.5);
     const cy = gridTop + rowH * (row + 0.85);
-    grid += `<text x="${cx}" y="${cy}" text-anchor="middle" fill="${C.dark}" font-family="Mulish" font-weight="600" font-size="${W * 0.021}">${day}</text>`;
+    grid += `<text x="${cx}" y="${cy}" text-anchor="middle" fill="${C.dark}" font-family="${SERIF}" font-weight="400" font-size="${W * 0.024}" ${NUM}>${day}</text>`;
     meta.push({ day, x: (cx - colW * 0.42) / W, y: (cy - rowH * 0.66) / H, w: (colW * 0.84) / W, h: (rowH * 0.88) / H, cx: cx / W, cy: cy / H });
   });
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
@@ -166,8 +177,8 @@ function sheet(month, W) {
     <polygon id="band" points="${band.replace(/(\d+(?:\.\d+)?),(\d+(?:\.\d+)?)/g, (m, x, y) => `${x},${Math.max(RING, +y)}`)}" fill="${C[d.band]}"/>
     ${second}
     <image href="${logo}" x="${PW * 0.1}" y="${RING + (H - RING) * 0.09}" width="${lw}" height="${lw * LOGO_RATIO}"/>
-    <text id="mname" x="${nameX}" y="${nameY}" fill="${fg}" font-family="Montserrat" font-weight="700" font-size="${nameSize}" letter-spacing="-0.02em">${MONTHS[month]}</text>
-    <text x="${W - W * 0.035}" y="${RING + (H - RING) * 0.1}" text-anchor="end" fill="${C.light}" font-family="Montserrat" font-weight="700" font-size="${W * 0.02}">2027</text>
+    <text id="mname" x="${nameX}" y="${nameY}" fill="${fg}" font-family="${SERIF}" font-weight="700" font-size="${nameSize}" letter-spacing="-0.01em">${MONTHS[month]}</text>
+    <text x="${W - W * 0.035}" y="${RING + (H - RING) * 0.1}" text-anchor="end" fill="${C.light}" font-family="${SERIF}" font-weight="700" font-size="${W * 0.022}" ${NUM}>2027</text>
     ${grid}
   </svg>`;
   return { W, H, svg, meta, month };

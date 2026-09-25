@@ -4,9 +4,10 @@ import { useEffect, useRef } from 'react';
 import { gsap, ScrollTrigger } from '@/lib/motion';
 import { useToneAt } from '@/lib/useTone';
 
-// Raíl de progreso: una espiral wire-o vertical de 24 anillas finas que se rellenan con el
-// progreso: de fucsia sobre fondo claro y de blanco sobre fucsia, mármol o vídeo. En móvil, más
-// pequeña. La altura del documento se mide al refrescar, nunca en el bucle.
+// Raíl de progreso: 24 marcas finas horizontales (rayitas), como una regla. Las recorridas se
+// alargan y se rellenan: de fucsia sobre fondo claro y de blanco sobre fucsia, mármol o vídeo. Antes
+// eran anillas de espiral y, en pequeño, se leían como una columna de ceros. En móvil, más pequeño.
+// La altura del documento se mide al refrescar, nunca en el bucle.
 const N = 24;
 const GAP = 12;
 
@@ -30,13 +31,14 @@ export default function ProgressRail() {
     return () => { gsap.ticker.remove(tick); ScrollTrigger.removeEventListener('refresh', measure); };
   }, []);
 
-  const rings = Array.from({ length: N }, (_, i) => (
-    <path key={i} d={`M3 ${6 + i * GAP} c 0 -4 14 -4 14 0 c 0 4 -14 4 -14 0`} />
+  // Base: rayas cortas a la derecha. Relleno: las mismas, más largas y gruesas, recortadas por el progreso.
+  const ticks = (x0) => Array.from({ length: N }, (_, i) => (
+    <path key={i} d={`M${x0} ${4 + i * GAP} H20`} />
   ));
   return (
     <div className={`rail tone-${tone}`} aria-hidden="true">
-      <svg className="rail__base" viewBox={`0 0 20 ${N * GAP + 4}`}>{rings}</svg>
-      <svg ref={fillRef} className="rail__fill" viewBox={`0 0 20 ${N * GAP + 4}`}>{rings}</svg>
+      <svg className="rail__base" viewBox={`0 0 20 ${N * GAP}`} preserveAspectRatio="none">{ticks(12)}</svg>
+      <svg ref={fillRef} className="rail__fill" viewBox={`0 0 20 ${N * GAP}`} preserveAspectRatio="none">{ticks(4)}</svg>
     </div>
   );
 }

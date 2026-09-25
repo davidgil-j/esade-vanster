@@ -226,57 +226,45 @@ el teléfono, la dirección y la web de Vänster.
 
 ### El copy
 
-*Pasado por el linter de slopmonster (5/5, pero su nota es de inglés y aquí no vale) y revisado a
-mano contra la ley 1 de `criterio.md`. Aprobado por David con tres cambios, ya aplicados.*
+*Ronda de David del 2026-09-24: menos letra, títulos sutiles y estratégicos, dos en pregunta. Pasado
+por el linter de slopmonster (5/5, su nota es de inglés) y revisado a mano contra la ley 1 de
+`criterio.md`. Fuente única: `src/content/copy.js`. De unas 434 palabras visibles a 240.*
 
 **1 · Portada**
-- H1: La agenda y el calendario de Esade para 2027
-- Subtexto: Una propuesta de Vänster para regalar a vuestra gente a fin de año.
+- H1: Un año entero sobre la mesa
+- Subtexto: La agenda y el calendario 2027 de Esade, para regalar a fin de año.
 - Botón: Ver la propuesta
 
 **2 · La idea**
-- H2: Un catálogo pone vuestro logo. Nosotros diseñamos el objeto.
-- Una agenda genérica con un logo impreso se reconoce enseguida como regalo promocional. Nosotros
-  empezamos por la página en blanco y diseñamos la agenda y el calendario con la identidad de
-  Esade, para que quien los abra en enero piense que los ha hecho Esade.
+- H2: ¿Un logo en una agenda o una agenda de Esade?
+- Una agenda de catálogo con un logo se reconoce enseguida como regalo promocional. Nosotros
+  diseñamos el objeto entero con la identidad de Esade.
 
-**3 · La agenda 2027**
-- H2: La agenda 2027
-- De espiral, con tapa dura y en un tamaño tipo A5. La espiral deja que se abra plana sobre la
-  mesa, que es donde va a pasar el año.
-- Las tapas llevan los azules de Esade y sus diagonales, y la palabra esade escrita como en el
-  logotipo.
-- Una idea para hablarlo: el nombre de cada persona en su tapa. Así nadie se lleva de la sala de
-  reuniones la agenda de otro.
+**3 · La agenda**
+- H2: ¿Dónde pasa el año una agenda?
+- Abierta sobre la mesa. Por eso es de espiral, con tapa dura y tamaño A5, y lleva los azules y las
+  diagonales de Esade.
 
-**4 · El calendario de sobremesa 2027**
-- H2: El calendario de sobremesa 2027
-- Dos paneles: en uno, el mes; en el otro, el diseño. Se queda en la mesa de cada persona los
-  doce meses, a la vista de quien trabaja ahí y de quien pasa por delante.
-- Otra idea: marcar en él las fechas propias de Esade, las que no salen en ningún calendario
-  comprado.
+**4 · El calendario**
+- H2: Doce meses a la vista
+- En un panel, el mes; en el otro, el diseño de Esade. Y sus fechas marcadas, las que no trae
+  ningún calendario comprado.
+- Campo: Marca una fecha de Esade
 
-**5 · Con vuestra marca**
-- H2: Con el manual de Esade abierto al lado
-- Los dos azules principales, en cada pieza. Como mucho tres colores por pieza, como pide el
-  manual. Las diagonales entre 5 y 15 grados. Y esade en minúsculas cada vez que el nombre hace de
-  elemento gráfico.
-- Para que no tengáis que devolvernos una prueba por un color.
+**5 · Quiénes somos** (el 1-2-3 de L'Occitane, sin párrafos)
+- H2 (etiqueta): Quiénes somos
+- 01 Diseñamos desde cero · 02 Con vuestra marca · 03 Y lo producimos
 
-**6 · Quiénes somos**
-- H2: Ya conocemos vuestra marca
-- Somos Vänster, un estudio de diseño de Barcelona desde 2010. Para Esade hemos maquetado y
-  diseñado programas, informes y gráficas para eventos y jornadas.
-- Diseñamos el objeto y nos ocupamos también de producirlo, así que tenéis un solo interlocutor
-  de la primera idea al objeto impreso.
-
-**7 · Cierre**
-- H2: ¿Lo hablamos?
-- Si ya regaláis algo a vuestra gente a fin de año, esto puede serlo este año. Si no, es una forma
-  sencilla de empezar.
-- El precio, las cantidades y los plazos los vemos juntos cuando nos escribáis.
+**6 · Cierre**
+- H2: ¿Hablamos de los próximos pasos?
+- Nos encantaría presentaros la propuesta en persona, resolver cualquier duda y ajustar cada pieza
+  a lo que necesitan de verdad vuestros equipos.
 - Botón: Quiero hablarlo (abre un correo a info@vanster.design)
-- Datos: info@vanster.design · 93 164 89 25 · c. Diputació, 322, 08009 Barcelona · vanster.design
+- Datos: info@vanster.design · 93 164 89 25 · c. Diputació, 322, 08009 Barcelona (abre Google Maps)
+  · vanster.design
+
+**Fuera:** la sección «Con el manual de Esade abierto al lado» (eliminada por David el 2026-09-24,
+con su apilado).
 
 **Descripción para compartir el enlace:** Propuesta de Vänster para Esade: una agenda y un
 calendario 2027 diseñados con la identidad de Esade, como regalo de fin de año para vuestra gente.
@@ -791,3 +779,102 @@ vez» y «jerarquía solo con composición»; lo de la agenda me lo dejó a mí.
 - **Cierre en fucsia en multiplicar sobre el anochecer:** el texto blanco nunca baja de 6:1,
   porque el multiplicar solo oscurece el fucsia.
 
+### Auditoría de David sobre esade-vanster.vercel.app (2026-09-24)
+
+- **Open Graph:** imagen de 1200×630 (`public/og/vanster-esade.jpg`, 128 KB, generada con
+  `scripts/og-image.cjs`).
+  - Lleva el lockup en blanco sobre el mármol fucsia y la agenda cerrada con «Marta Puig», con la
+    misma transformación desde las esquinas que la web.
+  - La foto se recorta sobre la agenda y nunca pisa el lockup: en el primer intento tapaba el logo
+    de Esade.
+  - `metadataBase` es `https://esade-vanster.vercel.app`, con tarjeta grande de X
+    (`summary_large_image`).
+  - Vista previa comprobada con las etiquetas reales en `design/final-check/antes-despues/og-vista-previa.png`.
+    En producción se verá cuando se despliegue.
+- **Serif en los objetos de Esade:** primero Georgia, la equivalente del manual; después
+  **Newsreader**, aplicada por el encargo de David («la libre más parecida a Esade Type»): en las
+  fotos y en el nombre de la tapa (next/font, línea base medida de 0,735em).
+  - Va en el nombre de la tapa, el año de la tapa, los meses, los días y las letras de la semana
+    del calendario, y la semana de la agenda.
+  - La interfaz sigue en Montserrat y Mulish.
+  - El nombre del mes sigue sin rozar ninguna diagonal en las 12 hojas: margen de 93 a 225 px.
+- **Agenda de catálogo sin el logo de Esade:** lleva un logo genérico neutro (un punto y «LOGO»)
+  impreso pequeño en una sola tinta gris plata, en el mismo sitio. La costura en reposo sigue sin
+  cortar ningún logo.
+- **Barra de progreso:**
+  - 24 marcas finas horizontales en vez de anillas de espiral, que en pequeño se leían como una
+    columna de ceros.
+  - Las recorridas son más largas y más gruesas, en fucsia sobre claro y en blanco sobre color.
+  - El trazo no se escala con el tamaño (`vector-effect: non-scaling-stroke`).
+
+### Ronda de David (2026-09-24, tarde)
+
+- **Vuelta atrás:** el rehecho de la landing (portada con foto fija y escenas de agenda y calendario
+  fijadas con sticky que retenían el scroll) se deshizo entero. El código vuelve al commit
+  «changes 1» más la auditoría. **Regla:** ninguna animación retiene el scroll.
+- **Fuera «Con el manual de Esade abierto al lado».**
+- **Menos letra y títulos sutiles:** el copy de arriba. El título del cierre baja a la escala del H1
+  (`--fs-h1`) para quedar en dos líneas.
+
+### Ronda de David (2026-09-24, noche)
+
+- **La agenda no se personaliza:** fuera el campo, el nombre de la tapa (CoverName) y la frase; la
+  imagen para compartir, sin nombre.
+- **Redondeo:** tres radios. 10px en fotos y ventana de mármol (leve, no compite con las diagonales
+  de Esade), 20px en el panel del selector y 999px en botones y campos. Nada en ángulo recto. En
+  móvil las fotos ya no van a sangre (media calle a cada lado) para que se vea el redondeo.
+- **Selector de fecha:** en píldora; el panel se abre hacia donde cabe dentro de la sección (antes
+  lo tapaba «Quiénes somos») y los días son círculos.
+- **Mármol en el catálogo:** bruma del mármol fucsia al 22 % detrás de las palabras de la agenda y
+  del calendario (MarbleWash, la de las fichas de L'Occitane): parallax con scrub y deriva de 30 s
+  en escritorio; quieta en móvil y con movimiento reducido.
+- **Quiénes somos:** el 1-2-3 de L'Occitane. Fucsia plano, tres ideas y una ventana cuadrada del
+  mármol con el logotipo blanco.
+- **Paso al cierre (MarbleClosing):** la ventana se abre hasta cubrir la pantalla (capa sticky
+  recortada con clip-path, sin pin: el scroll nunca se retiene) y, a mitad de camino, el campus al
+  anochecer entra por el mármol en multiplicar. Empieza con la ventana al 72 % de la pantalla y
+  acaba con el cierre al 30 %. 60 fps medidos (p99 16,8 ms). Con movimiento reducido, la ventana
+  fija y el cierre de antes.
+
+### Ronda de David (2026-09-24, cierre y catálogo)
+
+- **Mármol en el catálogo, mejor:** el mármol oscuro para titulares dentro de las letras de «¿Dónde
+  pasa el año una agenda?» y «Doce meses a la vista» (MarbleTitle: 6,4:1 sobre blanco y 5,7:1
+  sobre el gris papel en el píxel más claro; deriva de 40 s), y la bruma convertida en un halo
+  detrás del titular en vez de una mancha a la derecha.
+- **Cierre:** el título en pregunta, «¿Hablamos de los próximos pasos?». Todo el contenido en una
+  columna a la derecha (8-12): la mitad izquierda es del campus y su rótulo, que el título ya no
+  pisa (comprobado a 1024, 1280, 1440 y 1920; en el móvil el título queda por encima del rótulo).
+  Jerarquía: pregunta, texto, botón y, tras un filete, los datos más pequeños (en dos columnas
+  desde 1200 px).
+- **La dirección abre Google Maps** en otra pestaña (en el móvil, la app si está instalada).
+- **Personas:** Marta (RR. HH. de Esade, portátil), Pau (iPhone y tableta), Núria (teclado,
+  lector y movimiento reducido), Jordi (director de arte de Vänster) y Alex (QA de rendimiento).
+
+### Ronda de David (2026-09-25)
+
+- **Mármol del catálogo, más presente:** la bruma ya no es un halo solo en el titular: cubre toda
+  la pieza (titular, texto y alrededor de la foto) al 30 % y se desvanece hacia los bordes.
+- **Mármol vivo que sigue al cursor, arreglado:** guardaba la posición del lienzo en la página y le
+  sumaba el scroll; la capa del cierre es sticky (fija en pantalla), así que el efecto salía muy por
+  encima del cursor. Ahora mide el lienzo en cada movimiento (una lectura, sin escrituras).
+- **«Quiero hablarlo» del cierre:** con ratón, al pasar por encima el tirador se desliza solo hasta el
+  final llenando la píldora de mármol, y el texto se aparta sin desaparecer; al salir, vuelve (muelle
+  suave, sin rebote). En táctil, tocar o deslizar como antes.
+
+### Ronda de David (2026-09-25, piezas alternas)
+
+Skills: impeccable (polish, layout, animate, bolder), design-taste-frontend (lectura: landing
+editorial de gama alta; diales 7/6/3), high-end-visual-design, minimalist-ui (estilo cerrado),
+emil-design-eng, animate, apple-design, mobile-native e industrial-brutalist-ui (solo consulta: su
+geometría en ángulo recto choca con la regla de redondeo, así que no se aplica).
+- **Las piezas en zeta:** la agenda con título y foto a la izquierda y texto a la derecha; el
+  calendario en espejo (título sobre su foto a la derecha, texto y campo a la izquierda).
+- **Un mármol distinto en cada pieza:** la agenda, el apaisado, a la derecha y subiendo con el
+  scroll; el calendario, el vertical (otras vetas, a otra escala), volteado, a la izquierda y
+  bajando. El mármol de las letras de cada titular arranca en un punto distinto y deriva al revés.
+- **Un momento de movimiento por pieza:** la foto entra barriendo desde su lado (la agenda de
+  izquierda a derecha; el calendario en espejo) y se asienta de 1,06 a 1 (1,15 s, expo.out), y
+  luego un parallax corto con scrub, solo con ratón (PieceMedia). Sin pin; 60 fps medidos (p99
+  16,8 ms). Con movimiento reducido, quieto.
+- El texto de las piezas sube a 19 px con medida de 36 caracteres.

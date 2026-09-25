@@ -10,15 +10,13 @@ import Reveal from '@/components/Reveal';
 import Comparator from '@/components/Comparator';
 import AgendaSection from '@/components/AgendaSection';
 import CalendarSection from '@/components/CalendarSection';
-import MarcaSection from '@/components/MarcaSection';
 import Nosotros from '@/components/Nosotros';
 import Cierre from '@/components/Cierre';
-import StackCover from '@/components/StackCover';
+import MarbleClosing from '@/components/MarbleClosing';
 import { COPY } from '@/content/copy';
 
 // Orden cerrado en la fase 1. Vänster habla (mármol, bordes líquidos); Esade se enseña (fotos de
-// sus objetos, bordes rectos y lamas). Dos apilados sin pin: «La idea» sube sobre la portada y
-// «Quiénes somos» sube sobre «Con vuestra marca».
+// sus objetos, bordes rectos y lamas). Un apilado sin pin: «La idea» sube sobre la portada.
 export default function Home() {
   return (
     <>
@@ -51,14 +49,9 @@ export default function Home() {
         <AgendaSection />
         <CalendarSection />
 
-        <div className="stack">
-          <StackCover over="#nosotros">
-            <MarcaSection />
-          </StackCover>
-          <Nosotros />
-        </div>
-
-        <Cierre />
+        <MarbleClosing top={<Nosotros />}>
+          <Cierre />
+        </MarbleClosing>
       </main>
       <FlyingLockup />
     </>

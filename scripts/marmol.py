@@ -48,14 +48,15 @@ def oklab_to_lin(lab):
     return ((lab @ M2i.T) ** 3) @ M1i.T
 
 
-def text_safe(bgr8):
+def text_safe(bgr8, y_max=None):
     """Oscurece solo lo necesario para que el blanco se lea a 4,5:1 en todos los píxeles. Para que las
     vetas claras no se vuelvan grises, se les devuelve croma (OKLab) y el amarillo gira un poco hacia
     el naranja; al final, un tope duro garantiza la luminancia."""
+    y_max = y_max or Y_MAX
     lin = to_lin(bgr8[..., ::-1].astype(np.float32) / 255)  # RGB lineal
     Y = lin @ np.array([0.2126, 0.7152, 0.0722])
     s = 0.22
-    Yt = Y_MAX * (1 - np.exp(-Y / s)) / (1 - np.exp(-1 / s))
+    Yt = y_max * (1 - np.exp(-Y / s)) / (1 - np.exp(-1 / s))
     k = Yt / np.maximum(Y, 1e-6)
     lab = lin_to_oklab(lin * k[..., None])
     C = np.hypot(lab[..., 1], lab[..., 2])
@@ -68,7 +69,7 @@ def text_safe(bgr8):
     lab[..., 2] = C * np.sin(np.radians(h))
     out = np.clip(oklab_to_lin(lab), 0, 1)
     Y2 = out @ np.array([0.2126, 0.7152, 0.0722])
-    out *= np.minimum(1, Y_MAX / np.maximum(Y2, 1e-6))[..., None]
+    out *= np.minimum(1, y_max / np.maximum(Y2, 1e-6))[..., None]
     q = np.round(np.clip(to_srgb(out), 0, 1) * 255).astype(np.uint8)[..., ::-1]
     Yq = rel_lum(to_lin(q.astype(np.float32) / 255))
     ratio = 1.05 / (Yq + 0.05)
@@ -133,6 +134,13 @@ for fmt, fname in (('16x9', 'marmol-16x9.png'), ('9x16', 'marmol-9x16.png')):
 f = to_fucsia(cv2.imread(str(SRC / 'marmol-16x9.png')))
 crop = f[:, f.shape[1] // 4: f.shape[1] // 4 + f.shape[0] * 2]
 report['marmol-fucsia-boton'] = enc(cv2.resize(crop, (560, 280), interpolation=cv2.INTER_AREA), 'marmol-fucsia-boton', q_webp=78, q_avif=55)
+
+# Mármol para rellenar titulares sobre papel claro (background-clip: text): más oscuro (Y ≤ 0,12),
+# así el titular se lee a 5:1 o más sobre el fondo en todos los píxeles.
+f = to_fucsia(cv2.imread(str(SRC / 'marmol-16x9.png')))
+tit, _, _ = text_safe(f, y_max=0.12)
+tit = cv2.resize(tit, (1200, round(1200 * tit.shape[0] / tit.shape[1])), interpolation=cv2.INTER_AREA)
+report['marmol-fucsia-titulo'] = enc(tit, 'marmol-fucsia-titulo', q_webp=76, q_avif=52)
 
 # Amarillo de la veta: píxeles muy saturados y claros con tono entre 38° y 52°
 img = cv2.imread(str(SRC / 'marmol-16x9.png'))

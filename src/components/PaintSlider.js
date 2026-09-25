@@ -5,7 +5,7 @@ import Handle from './Handle';
 import RollLabel from './RollLabel';
 import { COPY } from '@/content/copy';
 import { MAILTO, copyEmail } from '@/lib/mail';
-import { SPRING, spring, clamp, prefersReducedMotion, panY, loadDrag } from '@/lib/motion';
+import { SPRING, SPRING_SOFT, spring, clamp, prefersReducedMotion, panY, loadDrag } from '@/lib/motion';
 
 // «Quiero hablarlo» del cierre como deslizable de pintura (PLAN.md · 5, punto 10C).
 // Píldora de 240×56 con filete blanco de 1 px. El tirador empieza a 6 px del borde izquierdo; al
@@ -13,8 +13,11 @@ import { SPRING, spring, clamp, prefersReducedMotion, panY, loadDrag } from '@/l
 // borde de avance ondulado. Pasado el 85 % se completa con un muelle y: abre el correo con el asunto
 // aprobado, copia la dirección con el aviso «Correo copiado» y vuelve al inicio con un muelle.
 // Un toque, un clic, Intro o Espacio hacen lo mismo que completarlo.
+// Con ratón, al pasar por encima el tirador se desliza solo hasta el final (el de L'Occitane) y el
+// texto se aparta al hueco que deja, sin desaparecer; al salir, vuelve. Muelle suave sin rebote.
 const PAD = 6;
 const KNOB = 44;
+const TEXT_SHIFT = -40; // el texto se corre a la izquierda cuando el tirador llega al final
 
 export default function PaintSlider() {
   const rootRef = useRef(null);
@@ -29,6 +32,7 @@ export default function PaintSlider() {
   const [copied, setCopied] = useState(false);
   const timer = useRef(null);
   const lastDrag = useRef(0);
+  const hovering = useRef(false);
 
   const render = (v) => {
     x.current = v;
@@ -39,7 +43,14 @@ export default function PaintSlider() {
     const w = width.current; // medido al redimensionar, nunca en el bucle
     fillRef.current.style.transform = `translate3d(${edge - w}px,0,0)`;
     paintRef.current.style.transform = `translate3d(${w - edge}px,0,0)`;
-    labelRef.current.style.opacity = String(1 - Math.min(1, p * 1.4));
+    if (hovering.current) {
+      // Deslizado por el cursor: el texto se queda y se corre al hueco
+      labelRef.current.style.opacity = '1';
+      labelRef.current.style.transform = `translate3d(${(TEXT_SHIFT * p).toFixed(2)}px,0,0)`;
+    } else {
+      labelRef.current.style.opacity = String(1 - Math.min(1, p * 1.4));
+      labelRef.current.style.transform = '';
+    }
   };
 
   const complete = async () => {
@@ -73,6 +84,26 @@ export default function PaintSlider() {
     ro.observe(root);
     if (prefersReducedMotion()) return () => ro.disconnect();
 
+    // Al pasar el cursor, se desliza solo; al salir, vuelve (solo ratón: en táctil no hay hover)
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const slideTo = (to) => {
+      anim.current?.stop();
+      anim.current = spring({ from: x.current, to, ...SPRING_SOFT, onUpdate: render });
+    };
+    const enter = (e) => {
+      if (e.pointerType !== 'mouse' || !fine.matches || root.classList.contains('is-dragging')) return;
+      hovering.current = true;
+      slideTo(maxX.current);
+    };
+    const leave = (e) => {
+      if (e.pointerType !== 'mouse' || root.classList.contains('is-dragging')) return;
+      slideTo(0);
+      // el texto sigue corrido mientras vuelve; se suelta al acabar
+      setTimeout(() => { if (x.current < 1) { hovering.current = false; render(x.current); } }, 700);
+    };
+    root.addEventListener('pointerenter', enter);
+    root.addEventListener('pointerleave', leave);
+
     const proxy = document.createElement('div');
     let x0 = 0;
     let drag;
@@ -87,6 +118,7 @@ export default function PaintSlider() {
         minimumMovement: 4,
         onPress() {
           anim.current?.stop();
+          hovering.current = false;
           x0 = x.current - this.x;
           InertiaPlugin.track(proxy, 'x');
           root.classList.add('is-dragging');
@@ -107,7 +139,7 @@ export default function PaintSlider() {
       });
       panY(drag);
     });
-    return () => { dead = true; ro.disconnect(); drag?.kill(); anim.current?.stop(); };
+    return () => { dead = true; ro.disconnect(); drag?.kill(); anim.current?.stop(); root.removeEventListener('pointerenter', enter); root.removeEventListener('pointerleave', leave); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

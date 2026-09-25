@@ -1,4 +1,5 @@
-// Copy aprobado en la fase 1 (PLAN.md), literal. No se reescribe aquí.
+// Copy de la ronda de David (septiembre 2026): menos letra, títulos sutiles y dos en pregunta.
+// Literal: no se reescribe aquí sin pasar por David.
 // Microcopy aprobado en la ronda 2: etiquetas de los controles y el aviso.
 
 export const CONTACT = {
@@ -6,55 +7,44 @@ export const CONTACT = {
   phone: '93 164 89 25',
   phoneHref: '+34931648925',
   address: 'c. Diputació, 322, 08009 Barcelona',
+  // Abre la dirección en Google Maps (en el móvil, en la app si está instalada)
+  mapsHref: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Carrer de la Diputació, 322, 08009 Barcelona')}`,
   web: 'vanster.design',
   webHref: 'https://vanster.design',
 };
 
 export const COPY = {
   hero: {
-    title: 'La agenda y el calendario de Esade para 2027',
-    sub: 'Una propuesta de Vänster para regalar a vuestra gente a fin de año.',
+    title: 'Un año entero sobre la mesa',
+    sub: 'La agenda y el calendario 2027 de Esade, para regalar a fin de año.',
     cta: 'Ver la propuesta',
   },
   idea: {
-    title: 'Un catálogo pone vuestro logo. Nosotros diseñamos el objeto.',
-    body: 'Una agenda genérica con un logo impreso se reconoce enseguida como regalo promocional. Nosotros empezamos por la página en blanco y diseñamos la agenda y el calendario con la identidad de Esade, para que quien los abra en enero piense que los ha hecho Esade.',
+    title: '¿Un logo en una agenda o una agenda de Esade?',
+    body: 'Una agenda de catálogo con un logo se reconoce enseguida como regalo promocional. Nosotros diseñamos el objeto entero con la identidad de Esade.',
   },
   agenda: {
-    title: 'La agenda 2027',
+    title: '¿Dónde pasa el año una agenda?',
     body: [
-      'De espiral, con tapa dura y en un tamaño tipo A5. La espiral deja que se abra plana sobre la mesa, que es donde va a pasar el año.',
-      'Las tapas llevan los azules de Esade y sus diagonales, y la palabra esade escrita como en el logotipo.',
-      'Una idea para hablarlo: el nombre de cada persona en su tapa. Así nadie se lleva de la sala de reuniones la agenda de otro.',
+      'Abierta sobre la mesa. Por eso es de espiral, con tapa dura y tamaño A5, y lleva los azules y las diagonales de Esade.',
     ],
-    fieldLabel: 'Pon un nombre en la tapa',
-    fieldDefault: 'Marta Puig',
   },
   calendar: {
-    title: 'El calendario de sobremesa 2027',
+    title: 'Doce meses a la vista',
     body: [
-      'Dos paneles: en uno, el mes; en el otro, el diseño. Se queda en la mesa de cada persona los doce meses, a la vista de quien trabaja ahí y de quien pasa por delante.',
-      'Otra idea: marcar en él las fechas propias de Esade, las que no salen en ningún calendario comprado.',
+      'En un panel, el mes; en el otro, el diseño de Esade. Y sus fechas marcadas, las que no trae ningún calendario comprado.',
     ],
     fieldLabel: 'Marca una fecha de Esade',
   },
-  marca: {
-    title: 'Con el manual de Esade abierto al lado',
-    body: 'Los dos azules principales, en cada pieza. Como mucho tres colores por pieza, como pide el manual. Las diagonales entre 5 y 15 grados. Y esade en minúsculas cada vez que el nombre hace de elemento gráfico.',
-    close: 'Para que no tengáis que devolvernos una prueba por un color.',
-  },
+  // Quiénes somos, el 1-2-3 de L'Occitane: tres ideas cortas, sin párrafos.
   nosotros: {
-    title: 'Ya conocemos vuestra marca',
-    body: [
-      'Somos Vänster, un estudio de diseño de Barcelona desde 2010. Para Esade hemos maquetado y diseñado programas, informes y gráficas para eventos y jornadas.',
-      'Diseñamos el objeto y nos ocupamos también de producirlo, así que tenéis un solo interlocutor de la primera idea al objeto impreso.',
-    ],
+    title: 'Quiénes somos',
+    ideas: ['Diseñamos desde cero', 'Con vuestra marca', 'Y lo producimos'],
   },
   cierre: {
-    title: '¿Lo hablamos?',
+    title: '¿Hablamos de los próximos pasos?',
     body: [
-      'Si ya regaláis algo a vuestra gente a fin de año, esto puede serlo este año. Si no, es una forma sencilla de empezar.',
-      'El precio, las cantidades y los plazos los vemos juntos cuando nos escribáis.',
+      'Nos encantaría presentaros la propuesta en persona, resolver cualquier duda y ajustar cada pieza a lo que necesitan de verdad vuestros equipos.',
     ],
     cta: 'Quiero hablarlo',
     copied: 'Correo copiado',

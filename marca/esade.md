@@ -298,8 +298,13 @@ explícitamente (p. 23).
 
 `[DECISIÓN de David, 2026-09-23]`
 
-- **Tipografía:** mientras no tengamos Esade Type, usamos las de Vänster, **Montserrat** para
-  titulares y **Mulish** para el cuerpo. Las dos son de Google Fonts. Se cambiarán si llega la
-  oficial.
+- **Tipografía:** mientras no tengamos Esade Type, la interfaz de la web va en las de Vänster,
+  **Montserrat** para titulares y **Mulish** para el cuerpo (Google Fonts).
+  - `[DECISIÓN de David, 2026-09-24]` **Dentro de los objetos de Esade** (tapa, nombre, meses y
+    números del calendario, semana) va **Georgia**, la «fuente de sistema equivalente» del manual
+    (p. 15).
+  - Propuesta pendiente de su visto bueno: **Newsreader** (Google Fonts). Se parece más en contraste
+    y proporción, tiene cifras alineadas y se ve igual en Android, donde Georgia no existe.
+  - Se cambiará todo si llega la oficial.
 - **Público de la landing:** quien decide el regalo en Esade (RRHH o Comunicación interna).
   **Tono de propuesta, no de venta agresiva.**

@@ -1,9 +1,8 @@
 'use client';
 
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Photo from './Photo';
 import Handle from './Handle';
-import CoverName, { BOX_W } from './CoverName';
 import { FOTOS } from '@/content/fotos';
 import {
   gsap, ScrollTrigger, EASE, D, SPRING_SOFT, spring, project, clamp, prefersReducedMotion, panY, loadDrag,
@@ -30,7 +29,7 @@ const [rx, ry, rw, rh] = G.anillas;
 const fwFor = () => (window.matchMedia('(max-width: 899px)').matches ? 0.76 : 0.8);
 const smooth = (t) => t * t * (3 - 2 * t);
 
-const AgendaOpen = forwardRef(function AgendaOpen({ name }, ref) {
+export default function AgendaOpen() {
   const frameRef = useRef(null);
   const stageRef = useRef(null);
   const coverRef = useRef(null);
@@ -41,7 +40,6 @@ const AgendaOpen = forwardRef(function AgendaOpen({ name }, ref) {
   const castLeft = useRef(null);
   const angle = useRef(0);
   const [open, setOpen] = useState(false);
-  const [faceScale, setFaceScale] = useState(0.5);
   const size = useRef({ w: 1, h: 1, persp: 1, fw: 0.8 });
   const anim = useRef(null);
   const lastDrag = useRef(0);
@@ -80,8 +78,6 @@ const AgendaOpen = forwardRef(function AgendaOpen({ name }, ref) {
     anim.current = spring({ from: angle.current, to: target, velocity, ...SPRING_SOFT, onUpdate: (v) => render(clamp(v, -2, 182)) });
   };
 
-  useImperativeHandle(ref, () => ({ close: () => { if (angle.current > 0.5) settle(false); } }));
-
   useEffect(() => {
     const stage = stageRef.current;
     const frame = frameRef.current;
@@ -94,31 +90,13 @@ const AgendaOpen = forwardRef(function AgendaOpen({ name }, ref) {
       size.current = { w, h, persp, fw };
       stage.style.perspective = `${persp}px`;
       stage.style.perspectiveOrigin = `${hingeX * 100}% 50%`;
-      setFaceScale((coverW * w) / BOX_W);
       render(angle.current);
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(frame);
 
-    // Reflejo de la estampación del nombre: sigue al puntero; en táctil, al scroll.
-    let raf = 0;
-    const move = (e) => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const box = frame.getBoundingClientRect();
-        frame.style.setProperty('--sheen', ((e.clientX - box.left) / box.width).toFixed(3));
-      });
-    };
-    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    let sheenST;
-    if (!prefersReducedMotion()) {
-      if (fine) frame.addEventListener('pointermove', move, { passive: true });
-      else sheenST = ScrollTrigger.create({ trigger: frame, start: 'top bottom', end: 'bottom top', onUpdate: (self) => frame.style.setProperty('--sheen', self.progress.toFixed(3)) });
-    }
-    const unSheen = () => { cancelAnimationFrame(raf); frame.removeEventListener('pointermove', move); sheenST?.kill(); };
-
-    if (prefersReducedMotion()) return () => { ro.disconnect(); unSheen(); };
+    if (prefersReducedMotion()) return () => ro.disconnect();
 
     // Arrastre: el ángulo sigue al dedo 1:1 (el borde exterior recorre dos anchos de tapa en 180°).
     const proxy = document.createElement('div');
@@ -176,7 +154,7 @@ const AgendaOpen = forwardRef(function AgendaOpen({ name }, ref) {
         });
       },
     });
-    return () => { dead = true; ro.disconnect(); unSheen(); drag?.kill(); st.kill(); anim.current?.stop(); };
+    return () => { dead = true; ro.disconnect(); drag?.kill(); st.kill(); anim.current?.stop(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -186,10 +164,9 @@ const AgendaOpen = forwardRef(function AgendaOpen({ name }, ref) {
   };
 
   const pct = (v) => `${v * 100}%`;
-  const faceStyle = { transform: `scale(${faceScale})` };
 
   return (
-    <div ref={frameRef} className="open" role="group" aria-label={`Agenda 2027 de Esade vista desde arriba, con el nombre ${name} en la tapa`}>
+    <div ref={frameRef} className="open" role="group" aria-label="Agenda 2027 de Esade vista desde arriba">
       <div ref={stageRef} className="open__stage">
         <Photo base="/fotos/agenda-abierta" sizes="(max-width: 899px) 132vw, 75vw" width={2400} height={1600} className="open__plate" alt="" />
         <div ref={castRight} className="open__cast open__cast--right" style={{ left: pct(hingeX), top: pct(coverTop), width: pct(coverW), height: pct(coverBot - coverTop) }} aria-hidden="true" />
@@ -199,13 +176,12 @@ const AgendaOpen = forwardRef(function AgendaOpen({ name }, ref) {
           type="button"
           className="open__cover"
           style={{ left: pct(hingeX), top: pct(coverTop), width: pct(coverW), height: pct(coverBot - coverTop) }}
-          aria-label={`${open ? 'Cerrar' : 'Abrir'} la agenda de ${name}`}
+          aria-label={`${open ? 'Cerrar' : 'Abrir'} la agenda`}
           aria-expanded={open}
           onClick={toggle}
         >
           <span className="open__face open__face--front">
             <Photo base="/fotos/tapa-plana" widths={[530, 1060]} sizes="(max-width: 899px) 45vw, 30vw" width={1060} height={1378} alt="" />
-            <CoverName name={name} transform={faceStyle.transform} className="cover-name--flat" />
             <span ref={shadeFront} className="open__shade" />
           </span>
           <span className="open__face open__face--back">
@@ -224,6 +200,4 @@ const AgendaOpen = forwardRef(function AgendaOpen({ name }, ref) {
       </div>
     </div>
   );
-});
-
-export default AgendaOpen;
+}

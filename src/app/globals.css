@@ -30,10 +30,12 @@
   /* Muelle sin rebote (rigidez 400, amortiguación crítica 40), escrito como curva: 450 ms */
   --spring: linear(0, 0.055 4.2%, 0.1734 8.3%, 0.3101 12.5%, 0.4422 16.7%, 0.5591 20.8%, 0.6575 25%, 0.7374 29.2%, 0.8009 33.3%, 0.8503 37.5%, 0.8883 41.7%, 0.9172 45.8%, 0.9389 50%, 0.9551 54.2%, 0.9672 58.3%, 0.9761 62.5%, 0.9826 66.7%, 0.9874 70.8%, 0.9909 75%, 0.9935 79.2%, 0.9953 83.3%, 0.9966 87.5%, 0.9976 91.7%, 0.9983 95.8%, 1);
 
-  /* Radios: solo tres. 0 (piezas de Esade, fotos, campos), 999px (píldoras y círculos) y 12px
-     (la única tarjeta: el panel del selector de fecha). */
+  /* Radios: solo tres. 10px (fotos y la ventana de mármol: redondeo leve, que no compita con
+     las diagonales de Esade), 20px (el panel del selector de fecha) y 999px (botones, campos,
+     píldoras y círculos). Nada en ángulo recto. */
+  --r-img: 10px;
+  --r-card: 20px;
   --r-pill: 999px;
-  --r-card: 12px;
 
   --gutter: clamp(20px, 5vw, 72px);
   --col-gap: clamp(16px, 2vw, 32px);
@@ -155,6 +157,21 @@ input, textarea, select { font-size: max(16px, 1em); }
 .h2 { font-size: var(--fs-h2); font-weight: 700; line-height: 1.05; letter-spacing: -0.025em; }
 .h2--xl { font-size: var(--fs-h2-xl); font-weight: 800; letter-spacing: -0.03em; }
 .split-line, .split-word { padding-bottom: 0.06em; margin-bottom: -0.06em; }
+/* Titular con el mármol de Vänster dentro de las letras (MarbleTitle). Deriva muy despacio; con
+   movimiento reducido, quieto. Sin la imagen, el fucsia plano. */
+.mask { display: block; overflow: clip; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.mask__inner { display: block; padding-bottom: 0.06em; }
+.marble-text {
+  color: transparent;
+  background-color: var(--vanster);
+  background-image: image-set(url('/marmol/marmol-fucsia-titulo.avif') type('image/avif'), url('/marmol/marmol-fucsia-titulo.webp') type('image/webp'));
+  background-size: 180% auto; background-position: 0% 40%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+@media (prefers-reduced-motion: no-preference) { .marble-text { animation: marble-drift 40s ease-in-out infinite alternate; } }
+@keyframes marble-drift { to { background-position: 100% 60%; } }
+.piece--calendar .marble-text { background-position: 100% 75%; animation-direction: alternate-reverse; }
 /* Titular de la portada: el mismo recorte partido en líneas y entero (con JS), para que al partirlo
    y al recomponerlo no cambie su caja visible (CLS 0). Holgura de 0,2em para los descendentes. */
 .js .hero__title { overflow: clip; padding-bottom: 0.2em; margin-bottom: -0.2em; }
@@ -322,9 +339,6 @@ input, textarea, select { font-size: max(16px, 1em); }
 
 /* ── Apilados (sin pin) ─────────────────────────────────── */
 .stack { position: relative; }
-.stack__under { position: sticky; top: 0; z-index: 2; }
-.stack__inner { transform-origin: 50% 30%; }
-.stack__dim { position: absolute; inset: 0; background: #0c0a10; opacity: 0; pointer-events: none; }
 
 /* ── 1 · Portada ────────────────────────────────────────── */
 .hero {
@@ -398,7 +412,7 @@ input, textarea, select { font-size: max(16px, 1em); }
 
 /* Comparador */
 .compare {
-  position: relative; overflow: hidden; container-type: inline-size;
+  position: relative; overflow: hidden; container-type: inline-size; border-radius: var(--r-img); isolation: isolate;
   touch-action: pan-y; -webkit-user-select: none; user-select: none; cursor: ew-resize;
   background: #d9d5ce;
 }
@@ -415,6 +429,42 @@ input, textarea, select { font-size: max(16px, 1em); }
 .piece { position: relative; z-index: 1; padding-block: calc(var(--section-y) * 1.1) var(--section-y); }
 .piece--agenda { background: var(--paper); padding-top: calc(var(--section-y) * 1.1 + var(--amp)); }
 .piece--calendar { background: var(--paper-2); }
+.piece > .grid-page { position: relative; z-index: 1; }
+/* Con el selector abierto, el calendario pasa por encima de «Quiénes somos» (red de seguridad: el
+   panel ya se abre hacia donde cabe dentro de la sección) */
+.piece--calendar:has(.picker__panel) { z-index: 4; }
+
+/* Bruma del mármol de Vänster en toda la pieza (MarbleWash): envuelve el titular, el texto y la
+   foto del objeto, y se desvanece hacia los bordes de la sección. Encima, un velo fijo del color
+   del fondo hace el desvanecido (sin máscaras que se repinten al hacer scroll). */
+.wash { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; --wash-rgb: 255 255 255; }
+.piece--calendar .wash { --wash-rgb: 243 243 244; }
+.wash__move { position: absolute; left: 0; right: 0; top: -80px; bottom: -80px; will-change: transform; }
+.wash__drift { position: absolute; inset: 0; transform: scale(1.06); }
+.wash picture { position: absolute; inset: 0; opacity: 0.3; }
+.wash img { width: 100%; height: 100%; object-fit: cover; }
+.wash__veil { position: absolute; inset: -2px; }
+/* Agenda: el mármol apaisado a la derecha, donde están el texto y el final del titular */
+.wash--agenda img { object-position: 0% 50%; }
+.wash--agenda .wash__veil {
+  background: radial-gradient(ellipse 58% 62% at 72% 42%, rgb(var(--wash-rgb) / 0) 0%, rgb(var(--wash-rgb) / 0.2) 38%, rgb(var(--wash-rgb) / 0.78) 70%, rgb(var(--wash-rgb)) 90%);
+}
+/* Calendario: el mármol vertical (otras vetas, más grandes), en espejo a la izquierda */
+.wash--calendario img { object-position: 50% 30%; transform: scaleX(-1); }
+.wash--calendario .wash__veil {
+  background: radial-gradient(ellipse 58% 62% at 26% 48%, rgb(var(--wash-rgb) / 0) 0%, rgb(var(--wash-rgb) / 0.2) 38%, rgb(var(--wash-rgb) / 0.78) 70%, rgb(var(--wash-rgb)) 90%);
+}
+@media (prefers-reduced-motion: no-preference) and (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  .wash__drift { animation: wash-drift 30s ease-in-out infinite alternate; }
+}
+@keyframes wash-drift { to { transform: scale(1.12) translate3d(-28px, 0, 0); } }
+@media (max-width: 899px) {
+  .wash__move { top: 0; bottom: 0; }
+  .wash--agenda .wash__veil { background: radial-gradient(ellipse 90% 50% at 65% 34%, rgb(var(--wash-rgb) / 0) 0%, rgb(var(--wash-rgb) / 0.2) 40%, rgb(var(--wash-rgb) / 0.75) 74%, rgb(var(--wash-rgb)) 94%); }
+  .wash--calendario .wash__veil { background: radial-gradient(ellipse 90% 50% at 35% 34%, rgb(var(--wash-rgb) / 0) 0%, rgb(var(--wash-rgb) / 0.2) 40%, rgb(var(--wash-rgb) / 0.75) 74%, rgb(var(--wash-rgb)) 94%); }
+}
+
+
 .piece__grid {
   grid-template-areas:
     'title title title title title title title title title title title title'
@@ -429,7 +479,19 @@ input, textarea, select { font-size: max(16px, 1em); }
   margin-bottom: clamp(32px, 5vh, 56px);
 }
 .piece__object { grid-area: object; }
-.piece__body { grid-area: body; align-self: start; display: grid; gap: 16px; color: var(--ink-2); max-width: 44ch; }
+.piece__body { grid-area: body; align-self: start; display: grid; gap: 16px; color: var(--ink-2); max-width: 36ch; font-size: 1.1875rem; line-height: 1.6; }
+/* El calendario, en espejo de la agenda: el titular encima de su objeto (a la derecha) y el texto y
+   el campo a la izquierda. La página alterna en zeta en lugar de repetir la misma pieza. */
+@media (min-width: 900px) {
+  .piece--calendar .piece__grid {
+    grid-template-areas:
+      '. . . . title title title title title title title title'
+      'body body body . object object object object object object object object'
+      'field field field . object object object object object object object object';
+  }
+  .piece--calendar .cal__frame, .piece--calendar .cal__controls { margin-left: auto; }
+  .piece--calendar .piece__field { max-width: 100%; }
+}
 .piece__field { grid-area: field; align-self: end; margin-top: 32px; }
 @media (max-width: 899px) {
   .piece__grid { grid-template-areas: 'title' 'body' 'object' 'field'; grid-template-rows: none; }
@@ -438,22 +500,10 @@ input, textarea, select { font-size: max(16px, 1em); }
   .piece__field { margin-top: 24px; }
 }
 
-.cover-name { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; filter: drop-shadow(0 0.5px 0.4px rgba(0, 0, 0, 0.35)); }
-.cover-name__text {
-  position: absolute; white-space: nowrap;
-  font-family: var(--font-display); font-weight: 700; line-height: 1; letter-spacing: -0.01em;
-  transform: translateY(-0.8585em); /* línea base de Montserrat con interlineado 1 */
-  color: transparent;
-  background: linear-gradient(100deg, #f1f2f4 30%, #ffffff 46%, #ffffff 54%, #f1f2f4 70%);
-  background-size: 320% 100%;
-  background-position: calc(var(--sheen, 0.5) * 100%) 0;
-  -webkit-background-clip: text; background-clip: text;
-}
-
 /* La agenda: un encuadre de la foto cenital (--fw de su ancho) que se desplaza al abrirla */
 .open {
   --fw: 0.8;
-  position: relative; overflow: hidden; background: #d9d5ce;
+  position: relative; overflow: hidden; background: #d9d5ce; border-radius: var(--r-img); isolation: isolate;
   aspect-ratio: calc(1.5 * var(--fw));
   max-width: calc((100svh - var(--header-h) - 64px) * 1.5 * var(--fw));
 }
@@ -479,7 +529,7 @@ input, textarea, select { font-size: max(16px, 1em); }
 .open__handle .handle { position: absolute; inset: 0; }
 .open__handle[data-dir='left'] .handle--right, .open__handle[data-dir='right'] .handle--left { visibility: hidden; }
 @media (max-width: 899px) {
-  .open { --fw: 0.76; margin-inline: calc(var(--gutter) * -1); max-width: none; }
+  .open { --fw: 0.76; margin-inline: calc(var(--gutter) * -0.5); max-width: none; }
 }
 
 /* Campos */
@@ -487,8 +537,8 @@ input, textarea, select { font-size: max(16px, 1em); }
 html:not(.js) .field, html:not(.js) .cal__controls { display: none; }
 .field__label { font-family: var(--font-display); font-size: var(--fs-label); font-weight: 600; color: var(--ink-2); letter-spacing: 0.01em; }
 .field__input {
-  height: 56px; width: 100%; padding: 0 16px;
-  border: 1.5px solid var(--ink); border-radius: 0; background: var(--paper); color: var(--ink);
+  height: 56px; width: 100%; padding: 0 24px;
+  border: 1.5px solid var(--ink); border-radius: var(--r-pill); background: var(--paper); color: var(--ink);
   font-family: var(--font-display); font-weight: 600; font-size: 1.125rem;
   transition: border-color var(--d-ui) var(--ease), box-shadow var(--d-ui) var(--ease);
 }
@@ -496,10 +546,10 @@ html:not(.js) .field, html:not(.js) .cal__controls { display: none; }
 .field__input--date { -webkit-appearance: none; appearance: none; }
 
 /* El calendario: encuadre fijo de la foto (80 % del ancho, centrado) */
-.cal__frame { position: relative; overflow: hidden; background: #d9d5ce; aspect-ratio: 1.2; max-width: calc((100svh - var(--header-h) - 140px) * 1.2); cursor: grab; }
+.cal__frame { position: relative; overflow: hidden; border-radius: var(--r-img); isolation: isolate; background: #d9d5ce; aspect-ratio: 1.2; max-width: calc((100svh - var(--header-h) - 140px) * 1.2); cursor: grab; }
 .cal__frame:focus-visible { outline-offset: 4px; }
 .cal__stage { position: absolute; left: 0; top: 0; width: 125%; transform: translateX(-10%); touch-action: pan-y; }
-@media (max-width: 899px) { .cal__frame { margin-inline: calc(var(--gutter) * -1); max-width: none; } }
+@media (max-width: 899px) { .cal__frame { margin-inline: calc(var(--gutter) * -0.5); max-width: none; } }
 .cal__plate img { width: 100%; height: auto; }
 .cal__sheets { position: absolute; left: 0; top: 0; transform-origin: 0 0; perspective: 1600px; perspective-origin: 50% 0; }
 .cal__sheet { position: absolute; inset: 0; transform-origin: 50% 0; transform-style: preserve-3d; }
@@ -515,8 +565,8 @@ html:not(.js) .field, html:not(.js) .cal__controls { display: none; }
 .picker { position: relative; }
 .picker__button {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  height: 56px; width: 100%; padding: 0 16px;
-  border: 1.5px solid var(--ink); border-radius: 0; background: var(--paper); color: var(--ink);
+  height: 56px; width: 100%; padding: 0 20px 0 24px;
+  border: 1.5px solid var(--ink); border-radius: var(--r-pill); background: var(--paper); color: var(--ink);
   font-family: var(--font-display); font-weight: 600; font-size: 1.125rem;
   cursor: pointer;
   transition: transform var(--d-mid) var(--spring);
@@ -525,7 +575,7 @@ html:not(.js) .field, html:not(.js) .cal__controls { display: none; }
 .picker__empty { color: var(--ink-2); font-weight: 500; }
 .picker__panel {
   position: absolute; z-index: 20; left: 0; top: calc(100% + 8px);
-  width: 320px; padding: 16px;
+  width: 328px; padding: 16px 16px 18px;
   background: var(--paper);
   border: 1px solid var(--rule); border-radius: var(--r-card);
   box-shadow: 0 18px 40px -12px rgba(22, 20, 26, 0.28);
@@ -533,6 +583,8 @@ html:not(.js) .field, html:not(.js) .cal__controls { display: none; }
   animation: picker-in var(--d-ui) var(--ease);
 }
 @keyframes picker-in { from { opacity: 0; transform: translateY(-4px) scale(0.98); } }
+.picker__panel--up { top: auto; bottom: calc(100% + 8px); transform-origin: 20% 100%; animation-name: picker-in-up; }
+@keyframes picker-in-up { from { opacity: 0; transform: translateY(4px) scale(0.98); } }
 .picker__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .picker__title { font-family: var(--font-display); font-weight: 700; font-size: 1rem; }
 .picker__nav { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--ink); cursor: pointer; }
@@ -543,7 +595,7 @@ html:not(.js) .field, html:not(.js) .cal__controls { display: none; }
 .picker__week, .picker__grid { display: grid; grid-template-columns: repeat(7, 1fr); }
 .picker__week span { text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--ink-2); padding: 4px 0 8px; }
 .picker__day {
-  height: 40px; border: 0; background: transparent; color: var(--ink);
+  width: 40px; height: 40px; justify-self: center; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--ink);
   font-family: var(--font-body); font-weight: 600; font-size: 0.95rem;
   cursor: pointer; font-variant-numeric: tabular-nums;
   transition: background-color var(--d-press) var(--ease);
@@ -551,39 +603,12 @@ html:not(.js) .field, html:not(.js) .cal__controls { display: none; }
 .picker__day[aria-pressed='true'] { background: var(--vanster); color: #fff; }
 .picker__day:focus-visible { outline-offset: -2px; box-shadow: none; }
 
-/* ── 5 · Con vuestra marca ──────────────────────────────── */
-.marca { position: relative; background: var(--paper); padding-block: var(--section-y) calc(var(--section-y) + var(--amp)); box-shadow: inset 0 1px 0 var(--rule); }
-.marca__grid { row-gap: 56px; align-items: center; position: relative; z-index: 1; }
-.marca__text { grid-column: 1 / span 5; }
-.marca__body { margin-top: 28px; max-width: 46ch; color: var(--ink-2); }
-.marca__close { margin-top: 20px; font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; color: var(--ink); max-width: 30ch; }
-.marca__board {
-  grid-column: 7 / span 6;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule);
-  border: 1px solid var(--rule);
-}
-.demo { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--paper); display: grid; place-items: center; }
-.demo-blues { grid-template-columns: 1fr 1fr; gap: 10%; padding: 16%; place-items: stretch; }
-.demo-count { align-content: center; gap: 18px; }
-.demo-count__num { font-family: var(--font-display); font-weight: 800; font-size: clamp(4rem, 9vw, 8rem); line-height: 1; color: var(--esade-dark); font-variant-numeric: tabular-nums; }
-.demo-count__dots { display: flex; gap: 10px; }
-.demo-count__dot { width: 22px; height: 22px; }
-.demo-count__dot--white { background: #fff; box-shadow: inset 0 0 0 1px #c9c7cd; }
-.demo-angle { background: var(--esade-dark); }
-.demo-angle__band { position: absolute; left: -10%; top: 62%; width: 140%; height: 100%; background: var(--esade-light); transform-origin: 0 0; transform: rotate(-15deg); }
-.demo-angle__deg { position: absolute; right: 12%; top: 12%; font-family: var(--font-display); font-weight: 700; font-size: clamp(1.4rem, 2.4vw, 2rem); color: #fff; font-variant-numeric: tabular-nums; }
-.demo-logo > * { grid-area: 1 / 1; }
-.demo-logo__upper { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 4.4vw, 3.6rem); letter-spacing: 0.04em; color: var(--esade-dark); }
-.demo-logo__img { width: 58%; height: auto; }
-.demo-logo__upper { opacity: 0; }
-@media (prefers-reduced-motion: no-preference) { .js .demo-logo__upper { opacity: 1; } }
-
 /* ── 6 · Quiénes somos ──────────────────────────────────── */
 .nosotros {
   position: relative; z-index: 3; color: #fff; background: var(--vanster);
   padding-block: calc(var(--section-y) + var(--amp) * 0.5) var(--section-y);
 }
-/* borde líquido de Vänster al subir sobre «Con vuestra marca»: la misma onda, en fucsia plano */
+/* borde líquido de Vänster al subir sobre el calendario: la misma onda, en fucsia plano */
 .nosotros::before {
   content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: var(--amp);
   background: var(--vanster);
@@ -591,27 +616,76 @@ html:not(.js) .field, html:not(.js) .cal__controls { display: none; }
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 80' preserveAspectRatio='none'%3E%3Cpath d='M0 40C150 12 300 68 450 40S750 12 900 40S1150 68 1200 40V80H0Z'/%3E%3C/svg%3E") bottom / 1200px 100% repeat-x;
 }
 .nosotros ::selection { background: #fff; color: var(--vanster); }
-.nosotros__grid { row-gap: 40px; align-items: start; }
-.nosotros__logo { grid-column: 1 / span 5; padding-top: 0.6em; }
-.nosotros__logo img { width: 100%; max-width: 520px; height: auto; }
-.nosotros__text { grid-column: 7 / span 6; display: grid; gap: 28px; }
-.nosotros__lead { font-family: var(--font-display); font-weight: 600; font-size: var(--fs-lead); line-height: 1.25; letter-spacing: -0.015em; }
-.nosotros__body { max-width: 48ch; color: #fff; }
-@media (max-width: 899px) { .nosotros__logo img { max-width: 260px; } }
+.nosotros__grid { grid-template-rows: auto 1fr; row-gap: 56px; }
+.nosotros__eyebrow {
+  grid-column: 1 / span 5; grid-row: 1;
+  font-family: var(--font-display); font-size: var(--fs-label); font-weight: 600; line-height: 1.4;
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+.nosotros__ideas { grid-column: 6 / span 7; grid-row: 1 / span 2; border-top: 1px solid rgba(255, 255, 255, 0.32); }
+.nosotros__idea { display: grid; grid-template-columns: 3.2rem 1fr; align-items: baseline; padding: 28px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.32); }
+.nosotros__num { font-family: var(--font-display); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; }
+.nosotros__text { font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 700; line-height: 1.04; letter-spacing: -0.03em; text-wrap: balance; }
+/* La ventana de mármol: el punto de partida del cierre */
+.nosotros__window {
+  grid-column: 1 / span 4; grid-row: 2; align-self: end;
+  position: relative; aspect-ratio: 1; width: 100%; max-width: 340px;
+  border-radius: var(--r-img); overflow: hidden; display: grid; place-items: center;
+}
+.nosotros__still, .nosotros__still img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.nosotros__logo { position: relative; width: 56%; height: auto; transform-origin: center; }
+@media (max-width: 899px) {
+  .nosotros__grid { row-gap: 32px; }
+  .nosotros__ideas, .nosotros__window { grid-row: auto; }
+  .nosotros__idea { grid-template-columns: 2.4rem 1fr; padding: 20px 0; }
+  .nosotros__window { width: 64vw; max-width: 300px; margin-top: 16px; }
+}
+
+/* El paso al cierre (MarbleClosing): una capa fija a la pantalla (sticky) con el mármol vivo y el
+   anochecer en multiplicar, recortada a la ventana y abierta hasta cubrir la pantalla. */
+.closing { position: relative; z-index: 3; background: var(--vanster); color: #fff; }
+.closing__layer { position: sticky; top: 0; z-index: 10; height: 100lvh; margin-bottom: -100lvh; overflow: hidden; pointer-events: none; clip-path: inset(50%); }
+.closing__layer .marble { inset: 0; }
+.closing__night { position: absolute; inset: 0; opacity: 0; mix-blend-mode: multiply; }
+.closing__night img { width: 100%; height: 100%; object-fit: cover; }
+.closing__end { position: relative; z-index: 20; }
+.closing.is-on .nosotros { z-index: 15; background: transparent; }
+.closing.is-on .nosotros__still { opacity: 0; }
+.closing.is-on .cierre { background: transparent; }
+.closing.is-on .cierre__bg { display: none; }
 
 /* ── 7 · Cierre ─────────────────────────────────────────── */
-.cierre { position: relative; z-index: 4; color: #fff; padding-top: var(--section-y); background: var(--vanster); min-height: 100svh; display: flex; flex-direction: column; justify-content: space-between; }
+.cierre { position: relative; z-index: 4; color: #fff; padding-top: calc(var(--header-h) + 48px); background: var(--vanster); min-height: 100svh; display: flex; flex-direction: column; justify-content: space-between; }
 .cierre__bg { position: absolute; inset: 0; overflow: hidden; }
 .cierre__night, .cierre__night img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* el anochecer bajo el fucsia en multiplicar: las ventanas encendidas se leen, el color es de Vänster */
 .cierre__tint { position: absolute; inset: 0; background: var(--vanster); mix-blend-mode: multiply; }
-.cierre__grid { position: relative; z-index: 1; row-gap: 40px; align-items: end; }
-.cierre__title { grid-column: 1 / span 6; font-size: clamp(3rem, 8vw, 7.5rem); font-weight: 800; line-height: 0.98; letter-spacing: -0.04em; }
+.cierre__grid { position: relative; z-index: 1; row-gap: 28px; align-content: center; flex: 1; }
+/* Una columna a la derecha (8-12): la mitad izquierda es del campus y su rótulo, que el texto no
+   pisa en ningún ancho de escritorio (medido de 1024 a 1920). */
+.cierre__title {
+  grid-column: 8 / span 5;
+  font-size: var(--fs-h2-xl); font-weight: 800; line-height: 1.04; letter-spacing: -0.035em;
+  text-wrap: balance;
+}
 .cierre__side { grid-column: 8 / span 5; }
-.cierre__body { display: grid; gap: 16px; max-width: 42ch; }
-.contact { margin-top: 36px; display: grid; gap: 6px; font-size: 1rem; }
-.contact a { display: inline-flex; align-items: center; min-height: 44px; }
-.site-footer { position: relative; z-index: 1; padding-block: clamp(72px, 12vh, 140px) 40px; }
+.cierre__body { display: grid; gap: 16px; max-width: 40ch; font-size: 1.125rem; line-height: 1.6; }
+.cierre__side .paint-wrap { margin-top: 36px; }
+/* Los datos, secundarios: filete encima, más pequeños y en dos columnas */
+.contact {
+  margin-top: 44px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.3);
+  display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 36px; row-gap: 0;
+  font-size: 0.95rem;
+}
+@media (min-width: 1200px) { .contact { grid-template-columns: repeat(2, minmax(0, max-content)); } }
+.contact a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+.contact__map svg { flex: none; opacity: 0.8; }
+@media (max-width: 899px) {
+  .cierre__title, .cierre__side { grid-column: 1 / -1; }
+  .cierre__title { font-size: var(--fs-h1); }
+  .contact { margin-top: 36px; }
+}
+.site-footer { position: relative; z-index: 1; padding-block: 48px calc(36px + env(safe-area-inset-bottom, 0px)); }
 .site-footer .lockup { --lh: 24px; }
 
 /* Deslizable de pintura */
@@ -647,19 +721,19 @@ html:not(.js) .field, html:not(.js) .cal__controls { display: none; }
 .paint__knob { position: absolute; left: 6px; top: 6px; z-index: 2; }
 .toast--paint { left: 0; right: auto; top: calc(100% + 10px); }
 
-/* ── Raíl de progreso: la espiral ───────────────────────── */
+/* ── Raíl de progreso: marcas finas ─────────────────────── */
 .rail {
-  position: fixed; right: 12px; top: 50%; z-index: 40; pointer-events: none;
-  width: 16px; height: 292px; transform: translateY(-50%);
+  position: fixed; right: 14px; top: 50%; z-index: 40; pointer-events: none;
+  width: 20px; height: 288px; transform: translateY(-50%);
   color: var(--ink); --fill: var(--vanster);
 }
 .rail.tone-video, .rail.tone-marble { color: #fff; --fill: #fff; }
 .rail svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.rail path { fill: none; stroke-width: 1.2; }
-.rail__base path { stroke: currentColor; opacity: 0.3; }
-.rail__fill path { stroke: var(--fill); stroke-width: 1.8; }
+.rail path { fill: none; stroke-linecap: butt; vector-effect: non-scaling-stroke; }
+.rail__base path { stroke: currentColor; stroke-width: 1; opacity: 0.35; }
+.rail__fill path { stroke: var(--fill); stroke-width: 2; }
 .rail__fill { clip-path: inset(0 0 100% 0); }
-@media (max-width: 720px) { .rail { right: 4px; width: 11px; height: 200px; } }
+@media (max-width: 720px) { .rail { right: 6px; width: 14px; height: 216px; } }
 @media (max-height: 520px) { .rail { display: none; } }
 
 /* ── Movimiento reducido: todo visible y quieto ─────────── */

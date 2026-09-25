@@ -275,17 +275,18 @@ export class Marble {
     this.scale = Math.max(0.5, Math.min(dpr * k, texCap));
     this.canvas.width = Math.max(2, Math.round(r.width * this.scale));
     this.canvas.height = Math.max(2, Math.round(r.height * this.scale));
-    this.rectTop = r.top + window.scrollY;
-    this.rectLeft = r.left;
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     if (this.ready) this.draw();
   }
 
   onMove(e) {
     if (!this.visible) return;
-    // Posición relativa al canvas sin medir el layout: la guardada al redimensionar + el scroll.
-    const x = (e.clientX - this.rectLeft) * this.scale;
-    const y = (e.clientY + window.scrollY - this.rectTop) * this.scale;
+    // Posición relativa al canvas medida en el momento: la capa del cierre es sticky (se queda fija
+    // en la pantalla mientras la página baja) y la posición guardada + el scroll la desfasaba.
+    // Una lectura por movimiento, sin escrituras en medio: no fuerza maquetación.
+    const r = this.canvas.getBoundingClientRect();
+    const x = (e.clientX - r.left) * this.scale;
+    const y = (e.clientY - r.top) * this.scale;
     const last = this.trail[this.trail.length - 1];
     if (last && Math.hypot(last.x - x, last.y - y) < 12 * this.scale) return;
     this.trail.push({ x, y, life: 1 });

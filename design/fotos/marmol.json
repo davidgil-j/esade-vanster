@@ -103,6 +103,12 @@
   "webp": 22464,
   "avif": 13920
  },
+ "marmol-fucsia-titulo": {
+  "w": 1200,
+  "h": 675,
+  "webp": 35750,
+  "avif": 28909
+ },
  "amarillo_veta": "#FBA90E",
  "amarillo_pixeles": 16176
 }

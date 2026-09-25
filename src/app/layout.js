@@ -2,8 +2,8 @@ import { Montserrat, Mulish } from 'next/font/google';
 import { COPY } from '@/content/copy';
 import './globals.css';
 
-// Tipografías de Vänster (marca/vanster/LEEME.md). Dentro de los objetos de Esade
-// son provisionales hasta la fase 3 (PLAN.md): no tenemos Esade Type.
+// Tipografías de Vänster (marca/vanster/LEEME.md) para la web. Dentro de los objetos de Esade,
+// mientras no llegue Esade Type, Newsreader, horneada en las fotos (scripts/render-designs.cjs).
 const montserrat = Montserrat({
   subsets: ['latin'],
   weight: ['600', '700', '800'],
@@ -18,15 +18,35 @@ const mulish = Mulish({
   display: 'swap',
 });
 
+// Imagen para compartir el enlace: 1200×630 (scripts/og-image.cjs). metadataBase convierte sus
+// rutas en URLs absolutas, que es lo que piden WhatsApp, LinkedIn, Slack y X.
+const OG_IMAGE = {
+  url: '/og/vanster-esade.jpg',
+  width: 1200,
+  height: 630,
+  type: 'image/jpeg',
+  alt: 'vänster × esade: la agenda 2027 de Esade sobre el mármol fucsia de Vänster',
+};
+
 export const metadata = {
+  metadataBase: new URL('https://esade-vanster.vercel.app'),
   title: COPY.meta.title,
   description: COPY.meta.description,
   robots: { index: false, follow: false },
   openGraph: {
     title: COPY.meta.title,
     description: COPY.meta.description,
+    url: '/',
+    siteName: COPY.meta.title,
     type: 'website',
     locale: 'es_ES',
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: COPY.meta.title,
+    description: COPY.meta.description,
+    images: [OG_IMAGE],
   },
 };
 

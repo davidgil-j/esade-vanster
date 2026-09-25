@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
-import SplitHeading from './SplitHeading';
+import MarbleTitle from './MarbleTitle';
 import Reveal from './Reveal';
 import CalendarFlip from './CalendarFlip';
+import MarbleWash from './MarbleWash';
+import PieceMedia from './PieceMedia';
 import { COPY, MONTHS, WEEKDAYS } from '@/content/copy';
 import { monthGrid } from '@/lib/brand';
 import { scrollToTarget } from '@/lib/motion';
@@ -13,8 +15,12 @@ const toISO = (m, d) => `2027-${pad(m + 1)}-${pad(d)}`;
 
 // Selector propio (escritorio): una rejilla de 2027 en un desplegable, con teclado.
 // El foco vuelve al botón al elegir o al cerrar; el botón anuncia la fecha elegida.
+// Se abre hacia abajo si cabe entero en la pantalla y, si no, hacia arriba: el campo va al final de
+// la sección y, abierto hacia abajo, quedaba tapado por la siguiente.
+const PANEL_H = 400;
 function DatePicker({ value, onChange, labelId }) {
   const [open, setOpen] = useState(false);
+  const [up, setUp] = useState(false);
   const [view, setView] = useState(value ? value.m : 0);
   const [focusDay, setFocusDay] = useState(value ? value.d : 1);
   const wrapRef = useRef(null);
@@ -84,6 +90,12 @@ function DatePicker({ value, onChange, labelId }) {
         aria-expanded={open}
         onClick={() => {
           if (open) { close(false); return; }
+          // Hueco hasta el borde de la pantalla o de la sección, lo que llegue antes
+          const r = buttonRef.current.getBoundingClientRect();
+          const sec = buttonRef.current.closest('.piece')?.getBoundingClientRect();
+          const below = Math.min(window.innerHeight, sec ? sec.bottom : Infinity) - r.bottom;
+          const above = r.top - Math.max(0, sec ? sec.top : 0);
+          setUp(below < PANEL_H && above > below);
           setView(value ? value.m : view);
           setFocusDay(value ? value.d : 1);
           setOpen(true);
@@ -92,14 +104,14 @@ function DatePicker({ value, onChange, labelId }) {
         <span className={value ? '' : 'picker__empty'} aria-hidden="true">{display}</span>
         <span id={valueId} className="sr-only">{spoken}</span>
         <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
-          <rect x="2.5" y="4" width="15" height="13" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <rect x="2.5" y="4" width="15" height="13" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
           <line x1="2.5" y1="8" x2="17.5" y2="8" stroke="currentColor" strokeWidth="1.5" />
           <line x1="6.5" y1="2" x2="6.5" y2="5.5" stroke="currentColor" strokeWidth="1.5" />
           <line x1="13.5" y1="2" x2="13.5" y2="5.5" stroke="currentColor" strokeWidth="1.5" />
         </svg>
       </button>
       {open ? (
-        <div className="picker__panel" role="dialog" aria-label={`${MONTHS[view]} de 2027`}>
+        <div className={`picker__panel${up ? ' picker__panel--up' : ''}`} role="dialog" aria-label={`${MONTHS[view]} de 2027`}>
           <div className="picker__head">
             <button type="button" className="picker__nav" aria-label="Mes anterior" disabled={view === 0} onClick={() => moveTo(view - 1, focusDay)}>
               <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.6" /></svg>
@@ -135,7 +147,8 @@ function DatePicker({ value, onChange, labelId }) {
 }
 
 // Pieza 2 · El calendario de sobremesa 2027. Misma estructura que la agenda (pieza 1): título a
-// toda anchura, objeto protagonista, texto y campo al lado; sobre gris papel para marcar el cambio.
+// toda anchura, objeto protagonista, texto y campo al lado, sobre la bruma del mármol de Vänster;
+// sobre gris papel para marcar el cambio.
 export default function CalendarSection() {
   const [value, setValue] = useState(null);
   const [coarse, setCoarse] = useState(false);
@@ -165,11 +178,12 @@ export default function CalendarSection() {
 
   return (
     <section id="calendario" className="piece piece--calendar" data-tone="light" aria-labelledby="calendar-title">
+      <MarbleWash piece="calendario" />
       <div className="grid-page piece__grid">
-        <SplitHeading className="piece__title" id="calendar-title">{COPY.calendar.title}</SplitHeading>
-        <div ref={objRef} className="piece__object">
+        <MarbleTitle className="piece__title" id="calendar-title">{COPY.calendar.title}</MarbleTitle>
+        <PieceMedia ref={objRef} from="right">
           <CalendarFlip ref={flipRef} marked={value} />
-        </div>
+        </PieceMedia>
         <Reveal variant="fade" className="piece__body">
           {COPY.calendar.body.map((p) => <p key={p}>{p}</p>)}
         </Reveal>
