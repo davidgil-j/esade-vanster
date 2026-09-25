@@ -59,7 +59,7 @@ void main() {
     if (tr.z > 0.001) {
       vec2 dv = px - tr.xy;
       float w = tr.z * exp(-dot(dv, dv) / (uRadius * uRadius));
-      d += w * vec2(-dv.y, dv.x) / uRadius * 0.045 * sc;
+      d += w * vec2(-dv.y, dv.x) / uRadius * 0.022 * sc;
     }
   }
 
@@ -262,7 +262,9 @@ export class Marble {
   resize() {
     // Solo al cambiar de tamaño: nada de leer el layout dentro del bucle.
     const r = this.canvas.getBoundingClientRect();
-    const dpr = this.mobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+    // Como mucho 1 píxel de dispositivo por píxel CSS (en retina, 4 veces menos trabajo que a 2×; la
+    // textura es suave y no se nota). Si el equipo va justo, baja un escalón más (lowRes).
+    const dpr = this.lowRes ? 0.6 : 1;
     const k = this.mobile ? 0.5 : 1; // en móvil, media resolución interna
     // Nunca más píxeles de los que tiene la textura en ese encuadre (un poco menos: la textura ya es
     // suave y el filtro lineal la reparte): por encima no se gana detalle y la tarjeta gráfica
@@ -294,25 +296,28 @@ export class Marble {
   }
 
   tick(_t, deltaTime) {
-    if (!this.alive || !this.ready || !this.visible || document.hidden) return;
+    if (!this.alive || !this.ready || !this.visible || this.paused || document.hidden) return;
     const dt = Math.min(deltaTime, 50) / 1000;
-    // Agitación por el scroll: objetivo de 1 a 3×, con un muelle críticamente amortiguado (~1,2 s)
-    const target = 1 + Math.min(2, Math.abs(scrollVel) / 1400);
+    // Agitación por el scroll: de 1 a 1,4× como mucho, con un muelle críticamente amortiguado (~1,2 s)
+    const target = 1 + Math.min(0.4, Math.abs(scrollVel) / 4000);
     const w = 4;
     const acc = w * w * (target - this.agitation) - 2 * w * this.agitationV;
     this.agitationV += acc * dt;
     this.agitation += this.agitationV * dt;
-    this.time += dt * this.agitation * this.speed;
-    this.trail.forEach((p) => { p.life -= dt; });
+    this.time += dt * this.agitation * this.speed * 0.6;
+    this.trail.forEach((p) => { p.life -= dt * 1.4; });
     this.trail = this.trail.filter((p) => p.life > 0);
     this.draw();
-    // Vigilancia de rendimiento: 90 fotogramas visibles; si la media baja de 55 fps, imagen fija
+    // Vigilancia de rendimiento: si la mediana de 90 fotogramas baja de 50 fps, se baja la resolución
+    // interna una vez, sin cambiar de aspecto. Antes se cambiaba a una imagen fija a mitad de vista (un
+    // salto visible: parecía que el mármol «se rompía»). Solo con 30 fps o menos pasa a imagen fija.
     if (this.frames.length < 90) {
       this.frames.push(deltaTime);
       if (this.frames.length === 90) {
         const sorted = [...this.frames].sort((a, b) => a - b);
-        const median = sorted[45];
-        if (1000 / median < 55) this.onSlow?.('fps');
+        const fps = 1000 / sorted[45];
+        if (fps < 30 && this.lowRes) this.onSlow?.('fps');
+        else if (fps < 50 && !this.lowRes) { this.lowRes = true; this.resize(); this.frames = []; }
       }
     }
   }

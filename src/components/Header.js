@@ -1,19 +1,16 @@
-'use client';
-
 import Lockup from './Lockup';
-import CtaPill from './CtaPill';
-import { useToneAt } from '@/lib/useTone';
 
-// Cabecera fija: el lockup cambia de archivo según el fondo que tiene debajo (sin recolorear).
-// Mientras el lockup grande de la portada viaja hacia aquí, el de la cabecera espera escondido.
+// La isla: «vänster × esade» flotando arriba en el centro, en una píldora clara translúcida, con los
+// logos oficiales en color (vänster en su fucsia, esade en su azul). Es el mismo en toda la página:
+// no cambia con el fondo ni lleva botones (el «Quiero hablarlo» vive solo en el cierre). Pulsarla
+// vuelve al inicio. Al principio no se ve: el lockup grande de la portada viaja hasta aquí al bajar
+// (FlyingLockup) y la píldora aparece a la vez; al llegar, la isla toma el relevo.
 export default function Header() {
-  const tone = useToneAt(() => 36, 'video');
   return (
-    <header className={`site-header tone-${tone}`}>
-      <a className="site-header__brand link" href="#top" aria-label="vänster × esade, inicio">
-        <Lockup tone={tone === 'light' ? 'light' : 'dark'} />
+    <header className="island" data-print="hide">
+      <a className="island__pill press" href="#top" aria-label="vänster × esade, volver al inicio">
+        <Lockup tone="light" />
       </a>
-      <CtaPill className="site-header__cta" />
     </header>
   );
 }

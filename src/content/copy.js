@@ -13,11 +13,18 @@ export const CONTACT = {
   webHref: 'https://vanster.design',
 };
 
+// Foto de la portada (Wikimedia Commons, «Esade - Rambla de la Innovación.jpg»)
+export const CREDIT = {
+  author: 'Jorge Franganillo',
+  href: 'https://www.flickr.com/photos/franganillo/54583279275/',
+  licenseHref: 'https://creativecommons.org/licenses/by/2.0/deed.es',
+};
+
 export const COPY = {
   hero: {
-    title: 'Un año entero sobre la mesa',
-    sub: 'La agenda y el calendario 2027 de Esade, para regalar a fin de año.',
-    cta: 'Ver la propuesta',
+    // «2027 empieza en vuestra mesa»: el año va aparte para darle el fucsia de Vänster
+    year: '2027',
+    title: 'empieza en vuestra mesa',
   },
   idea: {
     title: '¿Un logo en una agenda o una agenda de Esade?',

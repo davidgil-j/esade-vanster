@@ -16,9 +16,10 @@ export default function Nosotros() {
         <h2 id="nosotros-title" className="nosotros__eyebrow">{COPY.nosotros.title}</h2>
         <ol className="nosotros__ideas">
           {COPY.nosotros.ideas.map((idea, i) => (
-            <Reveal as="li" key={idea} variant="fade" delay={i * 0.08} className="nosotros__idea">
+            <Reveal as="li" key={idea} variant="rise" delay={i * 0.07} className="nosotros__idea">
               <span className="nosotros__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <span className="nosotros__text">{idea}</span>
+              <span className="nosotros__rule" data-rule aria-hidden="true" />
             </Reveal>
           ))}
         </ol>

@@ -2,89 +2,62 @@
 
 import { useEffect, useRef } from 'react';
 import Lockup from './Lockup';
+import MarbleLayer from './MarbleLayer';
 import { COPY } from '@/content/copy';
-import { gsap, ScrollTrigger, SplitText, EASE, D, prefersReducedMotion, scrollToTarget } from '@/lib/motion';
+import { gsap, ScrollTrigger, SplitText, EASE, D, prefersReducedMotion } from '@/lib/motion';
 import { heroGate } from '@/lib/gate';
 
 const SLATS = 16;
 
-// Portada (PLAN.md · 5, punto 4): la fachada de Esade, desenfocada, al salir de la hoja de carga.
+// Portada: la Rambla de la Innovación del campus de Esade en Sant Cugat, a mediodía (foto de Jorge
+// Franganillo, CC BY 2.0; el crédito va en el pie). Los banderines de Esade con sus lemas, el cielo
+// limpio arriba y la gente paseando.
+// Entrada, al levantarse la hoja de carga:
 // 1. Lamas: 16 lamas verticales blancas, como las de la fachada, se abren desde su centro.
-// 2. Foco: de la imagen muy desenfocada al vídeo, que ya se está reproduciendo.
+// 2. Foco: de la foto muy desenfocada a la nítida, con un acercamiento lento (1,06 → 1).
 // 3. El titular cae por líneas con máscara justo cuando llega el foco.
-// 4. El subtexto y, al final, el lockup grande bajo el titular (FlyingLockup).
+// 4. Al final, «vänster × esade» abajo (FlyingLockup lo sube con la página hasta la isla).
+// El titular, en Esade Type y el azul oscuro de Esade, va en el hueco de cielo entre el edificio y
+// los banderines: ninguna letra pisa el banderín «esade».
+// El paso a «La idea» no tapa la portada: la tiñe. Al bajar, el fucsia de Vänster sube de abajo arriba
+// en multiplicar y encima se funde el mármol vivo; el titular se retira mientras tanto. Todo ligado a
+// la posición del scroll (sin pin, sin tiempo).
 // El titular se pinta desde el primer fotograma debajo de la hoja y de las lamas: solo se esconde
 // (partido en líneas) en el instante en que empieza su caída, tapado por las lamas.
 export default function Hero() {
   const rootRef = useRef(null);
   const innerRef = useRef(null);
-  const videoRef = useRef(null);
+  const photoRef = useRef(null);
   const stillRef = useRef(null);
-  const finalRef = useRef(null);
   const titleRef = useRef(null);
   const slatsRef = useRef(null);
-
-  // Vídeo: fuente según el formato de la pantalla; se empieza a descargar ya, durante la carga.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return undefined;
-    const portrait = window.matchMedia('(orientation: portrait) and (max-width: 899px)').matches;
-    const base = portrait ? '/video/portada-movil' : '/video/portada';
-    const webm = video.canPlayType('video/webm; codecs="vp9"');
-    if (prefersReducedMotion()) {
-      // Movimiento reducido: el último fotograma (el anochecer), quieto.
-      rootRef.current?.classList.add('is-final');
-      return undefined;
-    }
-    video.src = `${base}.${webm ? 'webm' : 'mp4'}`;
-    video.load();
-    // Fuera de pantalla no se descodifica (el vídeo ya habrá acabado casi siempre).
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting && !video.paused) video.pause();
-      else if (e.isIntersecting && video.dataset.started && !video.ended && video.paused) video.play().catch(() => {});
-    });
-    io.observe(rootRef.current);
-    return () => io.disconnect();
-  }, []);
+  const marbleInst = useRef(null);
 
   // Secuencia de entrada
   useEffect(() => {
     const root = rootRef.current;
     const d = document.documentElement;
-    const video = videoRef.current;
     let tl;
     let split;
     let onResize;
     let alive = true;
 
+    // «Enfoca»: la foto desenfocada cede a la nítida, que se acerca despacio hasta su sitio.
     const focus = () => {
-      // «Enfoca»: la imagen muy desenfocada cede al vídeo en cuanto está reproduciéndose.
-      const show = () => gsap.to(stillRef.current, { opacity: 0, duration: D.enter, ease: EASE });
-      if (!video.paused && video.readyState >= 3) show();
-      else video.addEventListener('playing', show, { once: true });
-    };
-    const startVideo = () => {
-      if (prefersReducedMotion() || !video.src) return;
-      video.dataset.started = '1';
-      video.play().catch(() => {
-        // Sin reproducción automática (ahorro de energía): el último fotograma, quieto.
-        root.classList.add('is-final');
-      });
+      gsap.to(stillRef.current, { opacity: 0, duration: 1.1, ease: EASE });
+      gsap.fromTo(photoRef.current, { scale: 1.06 }, { scale: 1, duration: 2.6, ease: 'expo.out', clearProps: 'transform' });
     };
 
     heroGate?.then(() => {
       if (!alive) return;
       if (d.classList.contains('hero-fallback') || prefersReducedMotion()) {
         d.classList.add('hero-go');
-        startVideo();
-        focus();
+        gsap.set(stillRef.current, { opacity: 0 });
         return;
       }
       split = SplitText.create(titleRef.current, { type: 'lines', mask: 'lines', linesClass: 'hero__line' });
       gsap.set(split.lines, { yPercent: -110 });
-      gsap.set(root.querySelectorAll('.hero__sub, .hero__cta'), { opacity: 0, y: 12 });
       d.classList.add('hero-go');
-      startVideo();
       // Al acabar, el titular se queda partido (recomponerlo contaría como desplazamiento, CLS);
       // solo se recompone si cambia el ancho de la ventana.
       tl = gsap.timeline({ onComplete: () => slatsRef.current?.remove() });
@@ -104,9 +77,7 @@ export default function Hero() {
       }, 0)
         .add(focus, 0.35)
         .to(split.lines, { yPercent: 0, duration: D.enter, ease: EASE, stagger: 0.08 }, 0.35)
-        .to(root.querySelector('.hero__sub'), { opacity: 1, y: 0, duration: D.enter, ease: EASE }, 0.6)
-        .to(root.querySelector('.hero__cta'), { opacity: 1, y: 0, duration: D.enter, ease: EASE }, 0.72)
-        .add(() => window.dispatchEvent(new Event('vx:lockup-in')), 0.85);
+        .add(() => window.dispatchEvent(new Event('vx:lockup-in')), 0.9);
     });
 
     return () => {
@@ -117,65 +88,64 @@ export default function Hero() {
     };
   }, []);
 
-  // Al subir «La idea» por encima, la portada se queda debajo: escala a 0,94 y se oscurece un poco.
+  // El tinte: de 0 a 0,45 pantallas de scroll (0,3 en el móvil)
   useEffect(() => {
     if (prefersReducedMotion()) return undefined;
-    const over = document.getElementById('idea');
-    if (!over) return undefined;
-    const tl = gsap.timeline({
-      scrollTrigger: { trigger: over, start: 'top bottom', end: 'top top', scrub: true },
-    });
-    tl.fromTo(innerRef.current, { scale: 1 }, { scale: 0.94, ease: 'none' }, 0)
-      .fromTo(rootRef.current.querySelector('.hero__dim'), { opacity: 0 }, { opacity: 0.4, ease: 'none' }, 0);
-    // La invitación a bajar se retira en cuanto hay scroll
+    const root = rootRef.current;
+    const tint = root.querySelector('.hero__tint');
+    const marble = root.querySelector('.hero__marble');
+    const content = root.querySelector('.hero__content');
+    const c01 = (v) => Math.min(1, Math.max(0, v));
+    const apply = (p) => {
+      tint.style.setProperty('--t', c01(p / 0.8).toFixed(4));
+      const mo = c01((p - 0.4) / 0.5);
+      marble.style.opacity = mo.toFixed(3);
+      // Invisible, el mármol no se pinta (antes trabajaba desde el primer fotograma de la portada)
+      if (marbleInst.current) marbleInst.current.paused = mo === 0;
+      const out = c01(p / 0.35);
+      content.style.opacity = (1 - out).toFixed(3);
+      content.style.transform = out ? `translate3d(0,${(-24 * out).toFixed(1)}px,0)` : '';
+    };
+    apply(0);
     const st = ScrollTrigger.create({
-      start: 8,
-      end: 'max',
-      onToggle: (self) => rootRef.current?.classList.toggle('is-scrolled', self.isActive),
+      start: 0,
+      // En el móvil, antes: el lockup sube por el centro y el rótulo tiene que estar ya cubierto
+      end: () => window.innerHeight * (window.matchMedia('(max-width: 899px)').matches ? 0.3 : 0.45),
+      onUpdate: (self) => apply(self.progress),
+      onRefresh: (self) => apply(self.progress),
     });
-    return () => { tl.scrollTrigger?.kill(); tl.kill(); st.kill(); };
+    return () => st.kill();
   }, []);
 
   return (
-    <section ref={rootRef} className="hero" data-tone="video" aria-labelledby="hero-title">
+    <section ref={rootRef} className="hero" data-tone="light" aria-labelledby="hero-title">
       <div ref={innerRef} className="hero__inner">
         <div className="hero__media">
-          <video
-            ref={videoRef}
-            className="hero__video"
-            muted
-            playsInline
-            preload="auto"
-            disableRemotePlayback
-            aria-hidden="true"
-            tabIndex={-1}
-          />
-          <picture ref={finalRef} className="hero__final">
-            <source type="image/avif" media="(orientation: portrait) and (max-width: 899px)" srcSet="/video/final-movil.avif" />
-            <source type="image/avif" srcSet="/video/final.avif" />
-            <img src="/video/final.webp" alt="" loading="lazy" decoding="async" />
+          <picture ref={photoRef} className="hero__photo">
+            <source type="image/avif" media="(orientation: portrait) and (max-width: 899px)" srcSet="/foto/rambla-movil.avif" />
+            <source type="image/avif" srcSet="/foto/rambla-1600.avif 1600w, /foto/rambla.avif 2560w" sizes="100vw" />
+            <source type="image/webp" media="(orientation: portrait) and (max-width: 899px)" srcSet="/foto/rambla-movil.webp" />
+            <img src="/foto/rambla-1600.webp" srcSet="/foto/rambla-1600.webp 1600w, /foto/rambla.webp 2560w" sizes="100vw" alt="La Rambla de la Innovación del campus de Esade en Sant Cugat, con los banderines de Esade" decoding="async" fetchPriority="high" />
           </picture>
-          <picture ref={stillRef} className="hero__still">
-            <source type="image/avif" media="(orientation: portrait) and (max-width: 899px)" srcSet="/video/fija-movil.avif" />
-            <source type="image/avif" srcSet="/video/fija.avif" />
-            <img src="/video/fija.webp" alt="" decoding="async" fetchPriority="high" />
+          <picture ref={stillRef} className="hero__still" aria-hidden="true">
+            <source type="image/avif" media="(orientation: portrait) and (max-width: 899px)" srcSet="/foto/rambla-movil-desenfocada.avif" />
+            <source type="image/avif" srcSet="/foto/rambla-desenfocada.avif" />
+            <img src="/foto/rambla-desenfocada.webp" alt="" decoding="async" />
           </picture>
         </div>
         <div className="hero__scrim" aria-hidden="true" />
+        <div className="hero__tint" aria-hidden="true" />
+        <div className="hero__marble" aria-hidden="true">
+          <MarbleLayer name="idea" onInstance={(m) => { marbleInst.current = m; if (m) m.paused = true; }} />
+        </div>
         <div className="hero__dim" aria-hidden="true" />
         <div className="hero__content">
-          <h1 ref={titleRef} id="hero-title" className="hero__title">{COPY.hero.title}</h1>
-          <p className="hero__sub">{COPY.hero.sub}</p>
-          <a
-            className="hero__cta link"
-            href="#idea"
-            onClick={(e) => { e.preventDefault(); scrollToTarget('#idea'); }}
-          >
-            {COPY.hero.cta}
-            <span className="hero__scroll" aria-hidden="true"><span /></span>
-          </a>
+          <h1 ref={titleRef} id="hero-title" className="hero__title">
+            <span className="hero__year">{COPY.hero.year}</span> {COPY.hero.title}
+          </h1>
           <div id="hero-lockup-slot" className="hero__slot">
-            <Lockup tone="dark" className="lockup--big hero__static-lockup" />
+            <span className="hero__lockup-color"><Lockup tone="light" className="lockup--big hero__static-lockup" /></span>
+            <span className="hero__lockup-white"><Lockup tone="dark" className="lockup--big hero__static-lockup" /></span>
           </div>
         </div>
         <div ref={slatsRef} className="slats" aria-hidden="true">

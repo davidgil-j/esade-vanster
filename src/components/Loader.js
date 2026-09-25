@@ -9,7 +9,7 @@ import { openHeroGate } from '@/lib/gate';
 // - Espera a la carga REAL: tipografías, la imagen fija de la portada y los datos del vídeo.
 // - El 6 gira a 7 como un marcador de tablillas (rotateX por mitades) y la hoja entera gira hacia
 //   arriba sobre su borde superior, como una página de calendario de sobremesa.
-// - Entre 0,9 y 2,2 s desde que se abre la página. Una vez por sesión. Con movimiento reducido,
+// - Entre 0,9 y 2,2 s desde que se abre la página. En cada carga de la página (también al recargar). Con movimiento reducido,
 //   un fundido de 300 ms. Sin JavaScript no existe (solo se pinta con html.js).
 // - La hoja es de mármol vivo y su flujo va más deprisa cuanto más ha cargado.
 const MIN_TOTAL = 900;
@@ -61,7 +61,6 @@ export default function Loader() {
     let killed = false;
     let tl;
     const finish = () => {
-      try { sessionStorage.setItem('vx-loader', '1'); } catch { /* sin almacenamiento */ }
       setGone(true);
     };
     const run = () => {

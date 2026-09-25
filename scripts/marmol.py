@@ -142,6 +142,43 @@ tit, _, _ = text_safe(f, y_max=0.12)
 tit = cv2.resize(tit, (1200, round(1200 * tit.shape[0] / tit.shape[1])), interpolation=cv2.INTER_AREA)
 report['marmol-fucsia-titulo'] = enc(tit, 'marmol-fucsia-titulo', q_webp=76, q_avif=52)
 
+# Mármol perla para el titular de la portada: casi blanco (L* 90-100) con la veta fucsia muy tenue
+# (croma al 35 %). Se lee como blanco con brillo sobre el velo oscuro de arriba de la portada.
+f = to_fucsia(cv2.imread(str(SRC / 'marmol-16x9.png')))
+lab = cv2.cvtColor(f, cv2.COLOR_BGR2LAB).astype(np.float32)
+L = lab[..., 0] * 100 / 255
+L = 90 + (L - L.min()) / max(1e-3, L.max() - L.min()) * 10
+lab[..., 0] = L * 255 / 100
+lab[..., 1] = 128 + (lab[..., 1] - 128) * 0.35
+lab[..., 2] = 128 + (lab[..., 2] - 128) * 0.35
+perla = cv2.cvtColor(np.clip(lab, 0, 255).astype(np.uint8), cv2.COLOR_LAB2BGR)
+perla = cv2.resize(perla, (1200, round(1200 * perla.shape[0] / perla.shape[1])), interpolation=cv2.INTER_AREA)
+report['marmol-perla'] = enc(perla, 'marmol-perla', q_webp=78, q_avif=55)
+
+# Neones para el parpadeo del titular de la portada (Hero): el mármol encendido en dos colores de la
+# casa, luminosos y saturados para que contrasten sobre el cielo oscurecido. Fucsia (L* 66-90, croma
+# ×1,2) y oro, el amarillo de la veta de la «×» (tono llevado a ~70° en Lab, L* 72-96).
+def neon(src_bgr, L0, L1, chroma, hue=None):
+    lab = cv2.cvtColor(src_bgr, cv2.COLOR_BGR2LAB).astype(np.float32)
+    L = lab[..., 0] * 100 / 255
+    lab[..., 0] = (L0 + (L - L.min()) / max(1e-3, L.max() - L.min()) * (L1 - L0)) * 255 / 100
+    a = lab[..., 1] - 128
+    b_ = lab[..., 2] - 128
+    if hue is not None:
+        c = np.sqrt(a * a + b_ * b_)
+        c = c / max(1e-3, c.max()) * 90 + 25  # siempre con color: sin grises
+        h = np.deg2rad(hue) + (np.arctan2(b_, a) - np.arctan2(b_, a).mean()) * 0.25
+        a, b_ = c * np.cos(h), c * np.sin(h)
+    lab[..., 1] = 128 + a * chroma
+    lab[..., 2] = 128 + b_ * chroma
+    img = cv2.cvtColor(np.clip(lab, 0, 255).astype(np.uint8), cv2.COLOR_LAB2BGR)
+    return cv2.resize(img, (1200, round(1200 * img.shape[0] / img.shape[1])), interpolation=cv2.INTER_AREA)
+
+
+f = to_fucsia(cv2.imread(str(SRC / 'marmol-16x9.png')))
+report['marmol-neon-fucsia'] = enc(neon(f, 66, 90, 1.2), 'marmol-neon-fucsia', q_webp=78, q_avif=55)
+report['marmol-neon-oro'] = enc(neon(f, 72, 96, 0.9, hue=78), 'marmol-neon-oro', q_webp=78, q_avif=55)
+
 # Amarillo de la veta: píxeles muy saturados y claros con tono entre 38° y 52°
 img = cv2.imread(str(SRC / 'marmol-16x9.png'))
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV_FULL).astype(np.float32)

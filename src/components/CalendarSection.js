@@ -146,9 +146,8 @@ function DatePicker({ value, onChange, labelId }) {
   );
 }
 
-// Pieza 2 · El calendario de sobremesa 2027. Misma estructura que la agenda (pieza 1): título a
-// toda anchura, objeto protagonista, texto y campo al lado, sobre la bruma del mármol de Vänster;
-// sobre gris papel para marcar el cambio.
+// Pieza 02 · El calendario. La misma ficha que la agenda, en espejo: el texto (número, titular, texto
+// y el campo de fecha) a la izquierda y la pieza a la derecha. Mismo fondo que toda la página.
 export default function CalendarSection() {
   const [value, setValue] = useState(null);
   const [coarse, setCoarse] = useState(false);
@@ -180,32 +179,35 @@ export default function CalendarSection() {
     <section id="calendario" className="piece piece--calendar" data-tone="light" aria-labelledby="calendar-title">
       <MarbleWash piece="calendario" />
       <div className="grid-page piece__grid">
-        <MarbleTitle className="piece__title" id="calendar-title">{COPY.calendar.title}</MarbleTitle>
-        <PieceMedia ref={objRef} from="right">
+        <PieceMedia ref={objRef} depth={28}>
           <CalendarFlip ref={flipRef} marked={value} />
         </PieceMedia>
-        <Reveal variant="fade" className="piece__body">
-          {COPY.calendar.body.map((p) => <p key={p}>{p}</p>)}
-        </Reveal>
-        <div className="field piece__field">
-          <span className="field__label" id={labelId}>{COPY.calendar.fieldLabel}</span>
-          {coarse ? (
-            <input
-              className="field__input field__input--date"
-              type="date"
-              min="2027-01-01"
-              max="2027-12-31"
-              aria-labelledby={labelId}
-              value={value ? toISO(value.m, value.d) : ''}
-              onChange={(e) => {
-                const [y, m, d] = e.target.value.split('-').map(Number);
-                choose(y === 2027 ? { m: m - 1, d } : null);
-              }}
-            />
-          ) : (
-            <DatePicker value={value} onChange={choose} labelId={labelId} />
-          )}
-        </div>
+        <PieceMedia depth={-56} className="piece__text">
+          <p className="piece__num" aria-hidden="true">02</p>
+          <MarbleTitle className="piece__title" id="calendar-title">{COPY.calendar.title}</MarbleTitle>
+          <Reveal variant="fade" className="piece__body">
+            {COPY.calendar.body.map((p) => <p key={p}>{p}</p>)}
+          </Reveal>
+          <div className="field piece__field">
+            <span className="field__label" id={labelId}>{COPY.calendar.fieldLabel}</span>
+            {coarse ? (
+              <input
+                className="field__input field__input--date"
+                type="date"
+                min="2027-01-01"
+                max="2027-12-31"
+                aria-labelledby={labelId}
+                value={value ? toISO(value.m, value.d) : ''}
+                onChange={(e) => {
+                  const [y, m, d] = e.target.value.split('-').map(Number);
+                  choose(y === 2027 ? { m: m - 1, d } : null);
+                }}
+              />
+            ) : (
+              <DatePicker value={value} onChange={choose} labelId={labelId} />
+            )}
+          </div>
+        </PieceMedia>
       </div>
     </section>
   );

@@ -233,7 +233,6 @@ por el linter de slopmonster (5/5, su nota es de inglés) y revisado a mano cont
 **1 · Portada**
 - H1: Un año entero sobre la mesa
 - Subtexto: La agenda y el calendario 2027 de Esade, para regalar a fin de año.
-- Botón: Ver la propuesta
 
 **2 · La idea**
 - H2: ¿Un logo en una agenda o una agenda de Esade?
@@ -878,3 +877,141 @@ geometría en ángulo recto choca con la regla de redondeo, así que no se aplic
   luego un parallax corto con scrub, solo con ratón (PieceMedia). Sin pin; 60 fps medidos (p99
   16,8 ms). Con movimiento reducido, quieto.
 - El texto de las piezas sube a 19 px con medida de 36 caracteres.
+
+### Ronda de David (2026-09-25, skills una a una)
+
+- **impeccable (animate y polish):** acercamiento lento al campus en el cierre. La escala pasa de 1 a
+  1,16 ligada al scroll, con el origen en el rótulo «esade», que llena la mitad izquierda. En reposo
+  sigue acercándose despacio (CSS, 26 s, solo con el cierre a la vista). El contenido del cierre
+  entra en orden (pregunta, texto, botón, datos). `accent-color` del fucsia para los controles nativos.
+- **design-taste-frontend:** control final en verde (cero rayas largas, sin listeners de scroll, una
+  sola etiqueta sobre titular). Aviso: la idea, la agenda y el calendario encadenan tres
+  composiciones imagen/texto; se mantiene porque la alternancia la pidió David.
+- **high-end-visual-design:** las tres ideas de «Quiénes somos» suben desde un desenfoque que se
+  resuelve (0,9 s, expo.out, escalonadas 70 ms) y cada filete se dibuja de izquierda a derecha.
+- **minimalist-ui:** sombras del selector y de los tiradores más suaves y teñidas.
+- **industrial-brutalist-ui:** solo cifras tabulares en la numeración y los datos de contacto.
+- **emil-design-eng:** desplegable del selector a 200 ms; escalonado dentro de 30-80 ms.
+- **animate:** acercamiento revisado (puerta, propósito, curva sinusoidal, movimiento reducido).
+- **apple-design:** la cabecera sobre fondo claro pasa a material translúcido (blanco al 72 %,
+  desenfoque 18 px), con sólido si el sistema pide menos transparencia.
+- **mobile-native:** base en orden; el parallax nuevo no se monta en táctil.
+- **slopmonster:** texto 5/5.
+- El mármol del titular del calendario deriva por la zona fucsia de la textura (la esquina clara lo
+  apagaba). 60 fps medidos de la agenda al final (p99 16,8 ms), consola limpia a 1440 y 390.
+
+### Ronda de David (2026-09-25, portada e isla)
+
+- **Portada más simple:** fuera «Ver la propuesta» (con su línea de invitación a bajar) y fuera el
+  lockup grande. Solo el titular y la frase, centrados en el tercio de abajo, sobre la planta baja:
+  el rótulo «esade» de la fachada queda libre como imagen, el mismo criterio que en el cierre.
+- **La isla:** la cabecera deja de ser una barra a todo lo ancho con botón. Es una píldora clara
+  translúcida flotando arriba en el centro con «vänster × esade» en los colores oficiales (vänster
+  en su fucsia, esade en su azul), más pequeña (vänster a 13 px de alto), igual en toda la página.
+  Sin «Quiero hablarlo» fijo: el botón vive solo en el cierre. Fuera el lockup que volaba de la
+  portada a la cabecera.
+
+### Ronda de David (2026-09-25, animaciones rotas y portada)
+
+- **Por qué parecía todo roto al bajar** (grabado en vídeo en Chrome y en WebKit): las entradas
+  arrancaban tarde (al 85 % de la pantalla) y duraban de 0,7 a 1,15 s, y el barrido de las fotos iba
+  por tiempo. A ritmo normal de scroll se pasaba por títulos cortados, fotos sin aparecer y huecos.
+  Arreglo: todas las entradas arrancan en cuanto asoman (98 %) y duran 0,55-0,65 s; el barrido de las
+  fotos va ligado a la posición del scroll (nunca a medias). Ahora solo está a medio entrar lo que
+  asoma por abajo.
+- **Portada:** vuelve «vänster × esade» grande, en blanco, arriba y centrado, sobre el rótulo del
+  edificio; al bajar se arrastra hacia arriba, se hace pequeño y, en el último cuarto del viaje,
+  cambia a los colores oficiales mientras aparece la píldora de la isla, que toma el relevo. Lectura
+  de arriba abajo: marca, edificio de Esade, mensaje. **Regla: ninguna letra encima del rótulo
+  «esade» del edificio, ni quieta ni de viaje** (medido a 1280, 1440, 1920 y 390).
+- **Cierre en el móvil:** la cámara se acerca desde abajo (1,29) para subir el rótulo a la franja
+  entre la isla y el título; contenido abajo y compacto; el campus entra cuando el 1-2-3 ya se ha ido.
+
+### Ronda de David (2026-09-25, formato L'Occitane, tinte y vídeo)
+
+- **Formato de L'Occitane en las piezas:** ficha a dos columnas, la pieza en 7 columnas a un lado y
+  al otro el número en fucsia (01, 02), el titular con mármol y el texto; el calendario en espejo; en
+  móvil, la pieza primero. La bruma del mármol del lado del texto.
+- **Un solo fondo:** el calendario deja el gris papel; agenda y calendario sobre el mismo blanco.
+- **El vídeo de la agenda** (agenda_video, 10 s) sustituye a la foto que se abría arrastrando:
+  recodificado sin sonido (MP4 2 MB y WebM 1,2 MB, `public/video/agenda.*`) con su fotograma de
+  portada; se descarga a una pantalla de distancia, se reproduce en bucle al asomar y se para al
+  salir, como los de L'Occitane. Ojo: en dos fotogramas la página izquierda pone «enero 2026» (fallo
+  de la IA que lo generó).
+- **La portada se tiñe, no se tapa:** al bajar, el fucsia de Vänster sube de abajo arriba en
+  multiplicar con un borde muy suave (casi a la vez) y encima se funde el mármol vivo; el titular se
+  retira; las letras de «La idea» entran cuando el tinte es completo (nunca sobre el rótulo). Fuera
+  los bordes ondulados de «La idea»; al final, el mármol funde a blanco y entra la agenda sin corte.
+- **El viaje del lockup:** la píldora de la isla aparece solo en el último tramo, cuando el lockup ya
+  entra en ella (antes se veía un instante vacía).
+
+### Ronda de David (2026-09-25, carga, catálogo, mármol y firma final)
+
+- **Pantalla de carga 2026 → 2027 en cada carga** (también al recargar); antes, una vez por sesión.
+- **Sin huecos blancos en el catálogo:** fuera el barrido de las fotos (dejaba franjas blancas
+  mientras entraban) y menos aire entre «La idea» y las piezas.
+- **La letra ya no va pegada al fondo:** tres velocidades por ficha (scrub, solo ratón): el mármol,
+  lento; la pieza, algo más lenta que la página; el texto, algo más rápido.
+- **Mármol vivo, más tranquilo y sin fallos:** agitación con el scroll de 3× a 1,4× como mucho,
+  flujo al 60 %, remolino del cursor a la mitad y más breve. Ya no cambia de golpe a imagen fija a
+  mitad de vista (era el «se buguea y se quita el oscurecido»): si el equipo va justo, baja la
+  resolución sin cambiar de aspecto. Pinta a 1 píxel por píxel CSS como mucho (en retina, 4 veces
+  menos trabajo) y el de la portada no se pinta mientras es invisible. El oscurecido del campus en
+  el cierre, al 88 % (un pelín más claro).
+- **La firma final con el edificio:** el rótulo «esade» del fotograma de noche, nítido (pegado de la
+  foto original, alineado y con la luz de noche: `scripts/rotulo.py`, `public/video/final-rotulo*`),
+  y fuera la bandera y la farola. Al llegar al final, «vänster ×» aparece al lado del rótulo, a su
+  altura: el lockup lo completa la fachada. En el móvil va encima (al lado no cabe) y la foto funde
+  en el mármol por abajo. Sustituye al lockup pequeño del pie, y la isla se retira al llegar.
+
+### Ronda de David (2026-09-25, saltos de línea, cortes y firma)
+
+- **Titulares que saltaban de línea:** «¿Un logo en una agenda o una agenda de Esade?» (y la pregunta
+  del cierre) entraban partidos en palabras o líneas; partido, el navegador reparte las líneas distinto
+  y al juntarse saltaba. Ahora entran enteros tras una sola máscara (MarbleTitle con marble={false}):
+  alto medido idéntico en toda la entrada. Fuera WordsHeading y SplitHeading.
+- **Sin cortes entre secciones:** la bruma de mármol de cada pieza funde a blanco arriba y abajo (antes
+  empezaba y acababa en seco en el borde); «Quiénes somos» ya no entra con una onda sino con un
+  degradado largo que tiñe la página de fucsia sobre el final del calendario.
+- **Fuera «vänster ×» junto al rótulo** (no gustó): vuelve el lockup pequeño del pie y la isla hasta el
+  final. Se quedan el rótulo nítido y la fachada sin bandera.
+
+### Ronda de David (2026-09-25, portada y aire del cierre)
+
+- **Portada reordenada:** el titular arriba, en una línea en escritorio, con el mármol fucsia claro
+  (`marmol-fucsia-luz`, L* 66-96, 3:1 como mínimo sobre el velo de arriba) moviéndose muy despacio
+  dentro de las letras; en medio, la fachada y su rótulo libres (unos 100 px de aire); abajo, la frase
+  y «vänster × esade» grande, que al bajar viaja a la isla.
+- **El viaje sin pisar el rótulo:** en escritorio, en arco por la derecha (el rótulo queda a la
+  izquierda del centro); en el móvil, el tinte de mármol se completa antes (0,3 pantallas) y el rótulo
+  ya está cubierto cuando el lockup pasa por su altura.
+- **Cierre en escritorio:** la cámara se desplaza a la izquierda al llegar; el rótulo queda a unos
+  170 px de la pregunta (antes, casi pegado).
+- **Titular de la portada en mármol perla** (elegido por David entre blanco limpio, perla y cielo
+  fucsia): el rosa claro chocaba con el cielo azul. Ahora casi blanco (L* 90-100) con la veta fucsia muy
+  tenue moviéndose (`marmol-perla`, generado en scripts/marmol.py). Fuera `marmol-fucsia-luz`.
+- **Neón en el titular de la portada:** se apaga en negro y se enciende con otra textura, como un
+  rótulo de discoteca: perla → neón fucsia → neón oro (el amarillo de la veta), cada una 1,6-2,8 s
+  encendida y con un halo de su color; entre una y otra, una ráfaga (apagado, destello de la anterior,
+  apagado). Texturas `marmol-neon-fucsia` y `marmol-neon-oro` (scripts/marmol.py), 3:1 o más sobre el
+  cielo. Como mucho 2 destellos por segundo (WCAG 2.3.1), se para fuera de pantalla o con la pestaña
+  oculta; con movimiento reducido, quieto en perla.
+
+### Ronda de David (2026-09-25, portada limpia y cierre centrado)
+
+- **Titular nuevo:** «2027 empieza en vuestra mesa» (elegido por David entre cuatro opciones). En el
+  móvil, en dos líneas equilibradas («2027 empieza / en vuestra mesa»). deslop.py: 5/5.
+- **Fuera la frase de la portada** («La agenda y el calendario 2027 de Esade…»): solo titular y marca.
+- **Lockup de la portada más pequeño:** `--lh` de clamp(24px, 2,6vw, 40px) a clamp(20px, 2,15vw, 33px);
+  22 → 19 px en el móvil.
+- **Titular en neón fucsia fijo** (David: fijo, sin parpadeo): `marmol-neon-fucsia` con la veta a la
+  deriva y un halo muy difuminado (desenfoque de 1 px en el borde y resplandor tenue de 14 px) para que
+  no corte contra el cielo. Fuera el ciclo de neón y sus clases; `marmol-perla` y `marmol-neon-oro`
+  quedan en public/marmol sin usar.
+- **Cierre centrado, como el de L'Occitane:** la pregunta, el texto, el botón y el contacto en una
+  línea; abajo, tras un filete, la marca centrada. La cámara ya no aparta el rótulo a la izquierda: lo
+  centra y lo sube hasta justo encima de la pregunta (32-84 px de aire, medido de 1024 a 1920 y en
+  tableta vertical), con el acercamiento que quepa (hasta 1,16). La foto se funde por abajo en el
+  mármol. Si el rótulo no cabe encima de la pregunta (móviles bajos como 375×667, móvil en
+  horizontal), no hay campus: el cierre se queda en mármol. Pantallas bajas de escritorio: cierre algo
+  más compacto. Con movimiento reducido, la foto quieta subida un 19 %.
